@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 var MIRRORS = []string {"https://ftp.fau.de/gentoo", "https://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo",
@@ -27,6 +27,7 @@ var MIRRORS = []string {"https://ftp.fau.de/gentoo", "https://ftp-stud.hs-esslin
 					 "http://tux.rainside.sk/gentoo/",
 					 "https://mirror.bytemark.co.uk/gentoo/",
 					 "http://mirror.isoc.org.il/pub/gentoo/",
+                                         "https://gentoo.ussg.indiana.edu/",
 }
 
 func findMirror(requestURI string, w http.ResponseWriter, r *http.Request) {
@@ -56,7 +57,7 @@ func serveRoot(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello index")
 }
 func catchAllHandler(w http.ResponseWriter, r *http.Request) {
-	if r.RequestURI == "/" {
+	if r.RequestURI == "/" || r.RequestURI == "/index.htm" || r.RequestURI == "/index.html" {
 		serveRoot(w, r)
 		return
 	}
@@ -71,7 +72,7 @@ func main() {
 
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         "127.0.0.1:8000",
+		Addr:         "0.0.0.0:8000",
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 30 * time.Second,
 		ReadTimeout:  30 * time.Second,
