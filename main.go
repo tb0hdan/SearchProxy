@@ -140,7 +140,8 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 	}
 	for _, cfg := range C.Mirrors {
 		log.Printf("Registering mirror `%s` with prefix `%s`\n", cfg.Name, cfg.Prefix)
-		sps.RegisterMirrorsWithPrefix(cfg.URLs, cfg.Prefix)
+		sortedURLs := MirrorSort(cfg.URLs)
+		sps.RegisterMirrorsWithPrefix(sortedURLs, cfg.Prefix)
 	}
 }
 
