@@ -35,10 +35,20 @@ var MIRRORS = []string{"https://ftp.fau.de/gentoo", "https://ftp-stud.hs-essling
 type MirrorServer struct {
 	Cache *memcache.MemCacheType
 	Mirrors []string
+	Prefix string
+}
+
+func (ms *MirrorServer) StripRequestURI(requestURI string) (result string) {
+	result = strings.TrimLeft(requestURI, ms.Prefix)
+	if ! strings.HasPrefix(result, "/") {
+		result = "/" + result
+	}
+	return
 }
 
 func (ms *MirrorServer) CatchAllHandler(w http.ResponseWriter, r *http.Request) {
-	if r.RequestURI == "/" || r.RequestURI == "/index.htm" || r.RequestURI == "/index.html" {
+	strippedURI := ms.StripRequestURI(r.RequestURI)
+	if strippedURI == "/" || strippedURI == "/index.htm" || strippedURI == "/index.html" {
 		ms.serveRoot(w, r)
 		return
 	}
@@ -47,6 +57,8 @@ func (ms *MirrorServer) CatchAllHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (ms *MirrorServer) findMirror(requestURI string, w http.ResponseWriter, r *http.Request) {
+	requestURI = ms.StripRequestURI(requestURI)
+
 	for _, mirrorURL := range ms.Mirrors {
 		url := strings.TrimRight(mirrorURL, "/") + requestURI
 		if value, ok := ms.Cache.Get(requestURI); ok {
@@ -80,21 +92,56 @@ func (ms *MirrorServer) serveRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 
+type SearchProxyServer struct {
+	Gorilla *mux.Router
+	Addr string
+	ReadTimeout int
+	WriteTimeout int
+	Proxies []string
+}
 
-func main() {
-	cache := memcache.New()
-	ms := &MirrorServer{Cache: cache, Mirrors: MIRRORS}
-
-	r := mux.NewRouter()
-	r.PathPrefix("/").HandlerFunc(ms.CatchAllHandler)
-
+func (sps *SearchProxyServer) Run() {
 	srv := &http.Server{
-		Handler: r,
-		Addr:    "0.0.0.0:8000",
+		Handler: sps.Gorilla,
+		Addr:    sps.Addr,
 		// Good practice: enforce timeouts for servers you create!
-		WriteTimeout: 30 * time.Second,
-		ReadTimeout:  30 * time.Second,
+		WriteTimeout: time.Duration(int64(sps.WriteTimeout) * time.Second.Nanoseconds()),
+		ReadTimeout:  time.Duration(int64(sps.ReadTimeout) * time.Second.Nanoseconds()),
 	}
 
 	log.Fatal(srv.ListenAndServe())
+}
+
+func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []string, prefix string) {
+	cache := memcache.New()
+	ms := &MirrorServer{Cache: cache, Mirrors: mirrors, Prefix: prefix}
+	sps.Gorilla.PathPrefix(prefix).HandlerFunc(ms.CatchAllHandler)
+	sps.Proxies = append(sps.Proxies, prefix)
+}
+
+func (sps *SearchProxyServer) serveRoot(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Hello normal index\n")
+	for _, proxy := range sps.Proxies {
+		fmt.Fprintf(w, "Endpoint: %s\n", proxy)
+	}
+}
+
+func NewSearchProxyServer(addr string, readTimeout, writeTimeout int) (sps *SearchProxyServer){
+	sps = &SearchProxyServer{
+		Addr: addr,
+		ReadTimeout: readTimeout,
+		WriteTimeout: writeTimeout,
+	}
+	sps.Gorilla = mux.NewRouter()
+	sps.Gorilla.HandleFunc("/", sps.serveRoot)
+	sps.Gorilla.HandleFunc("/index.htm", sps.serveRoot)
+	sps.Gorilla.HandleFunc("/index.html", sps.serveRoot)
+	return
+}
+
+func main() {
+	searchProxyServer := NewSearchProxyServer("0.0.0.0:8000", 30, 30)
+	searchProxyServer.RegisterMirrorsWithPrefix(MIRRORS, "/gentoo")
+	searchProxyServer.Run()
 }
