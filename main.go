@@ -10,37 +10,19 @@ import (
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/spf13/viper"
 )
 
-var MIRRORS = []string{"https://ftp.fau.de/gentoo", "https://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo",
-	"http://ftp.fi.muni.cz/pub/linux/gentoo", "http://gentoo.mirror.web4u.cz",
-	"http://gentoo.mirror.web4u.cz/", "http://gentoo.modulix.net/gentoo",
-	"http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo",
-	"https://mirror.eu.oneandone.net/linux/distributions/gentoo/gentoo",
-	"https://mirror.netcologne.de/gentoo/",
-	"https://ftp.halifax.rwth-aachen.de/gentoo/",
-	"http://ftp.ntua.gr/pub/linux/gentoo/",
-	"https://mirrors.evowise.com/gentoo/",
-	"https://ftp.snt.utwente.nl/pub/os/linux/gentoo/",
-	"https://mirror.leaseweb.com/gentoo/",
-	"http://ftp.vectranet.pl/gentoo/",
-	"http://ftp.dei.uc.pt/pub/linux/gentoo/",
-	"https://gentoo.wheel.sk/",
-	"http://tux.rainside.sk/gentoo/",
-	"https://mirror.bytemark.co.uk/gentoo/",
-	"http://mirror.isoc.org.il/pub/gentoo/",
-	"https://gentoo.ussg.indiana.edu/",
-}
-
 type MirrorServer struct {
-	Cache *memcache.MemCacheType
+	Cache   *memcache.MemCacheType
 	Mirrors []string
-	Prefix string
+	Prefix  string
 }
 
 func (ms *MirrorServer) StripRequestURI(requestURI string) (result string) {
 	result = strings.TrimLeft(requestURI, ms.Prefix)
-	if ! strings.HasPrefix(result, "/") {
+	if !strings.HasPrefix(result, "/") {
 		result = "/" + result
 	}
 	return
@@ -91,13 +73,22 @@ func (ms *MirrorServer) serveRoot(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello index")
 }
 
+type MirrorConfig struct {
+	Name   string   `mapstructure:"name"`
+	Prefix string   `mapstructure:"prefix"`
+	URLs   []string `mapstructure:"urls"`
+}
+
+type MirrorsConfig struct {
+	Mirrors []MirrorConfig `mapstrcture:"mirrors"`
+}
 
 type SearchProxyServer struct {
-	Gorilla *mux.Router
-	Addr string
-	ReadTimeout int
+	Gorilla      *mux.Router
+	Addr         string
+	ReadTimeout  int
 	WriteTimeout int
-	Proxies []string
+	Proxies      []string
 }
 
 func (sps *SearchProxyServer) Run() {
@@ -127,10 +118,36 @@ func (sps *SearchProxyServer) serveRoot(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func NewSearchProxyServer(addr string, readTimeout, writeTimeout int) (sps *SearchProxyServer){
+func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
+	viper.SetConfigName("mirrors")
+	viper.AddConfigPath(".")
+	viper.SetConfigType("yaml")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			log.Println("err!")
+			// Config file not found; ignore error if desired
+		} else {
+			log.Println("err no parse!")
+			// Config file was found but another error was produced
+		}
+	}
+	var C MirrorsConfig
+
+	// fmt.Println(viper.Get("mirrors"))
+	err := viper.Unmarshal(&C)
+	if err != nil {
+		log.Fatalf("Unable to decode")
+	}
+	for _, cfg := range C.Mirrors {
+		log.Printf("Registering mirror `%s` with prefix `%s`\n", cfg.Name, cfg.Prefix)
+		sps.RegisterMirrorsWithPrefix(cfg.URLs, cfg.Prefix)
+	}
+}
+
+func NewSearchProxyServer(addr string, readTimeout, writeTimeout int) (sps *SearchProxyServer) {
 	sps = &SearchProxyServer{
-		Addr: addr,
-		ReadTimeout: readTimeout,
+		Addr:         addr,
+		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
 	}
 	sps.Gorilla = mux.NewRouter()
@@ -142,6 +159,6 @@ func NewSearchProxyServer(addr string, readTimeout, writeTimeout int) (sps *Sear
 
 func main() {
 	searchProxyServer := NewSearchProxyServer("0.0.0.0:8000", 30, 30)
-	searchProxyServer.RegisterMirrorsWithPrefix(MIRRORS, "/gentoo")
+	searchProxyServer.ConfigFromFile("mirrors", ".")
 	searchProxyServer.Run()
 }
