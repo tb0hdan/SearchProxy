@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"strings"
@@ -13,6 +14,8 @@ import (
 
 	"github.com/spf13/viper"
 )
+
+var debug = flag.Bool("debug", false, "enable debug")
 
 type MirrorServer struct {
 	Cache   *memcache.MemCacheType
@@ -143,6 +146,7 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 		sortedURLs := MirrorSort(cfg.URLs)
 		sps.RegisterMirrorsWithPrefix(sortedURLs, cfg.Prefix)
 	}
+	log.Println("SearchProxy started")
 }
 
 func NewSearchProxyServer(addr string, readTimeout, writeTimeout int) (sps *SearchProxyServer) {
@@ -159,6 +163,16 @@ func NewSearchProxyServer(addr string, readTimeout, writeTimeout int) (sps *Sear
 }
 
 func main() {
+	flag.Parse()
+	if *debug {
+		log.SetFormatter(&log.TextFormatter{
+			DisableColors: true,
+			FullTimestamp: true,
+		})
+		log.SetReportCaller(true)
+		log.SetLevel(log.DebugLevel)
+	}
+
 	searchProxyServer := NewSearchProxyServer("0.0.0.0:8000", 30, 30)
 	searchProxyServer.ConfigFromFile("mirrors", ".")
 	searchProxyServer.Run()
