@@ -60,8 +60,8 @@ func (ms *MirrorServer) findMirror(requestURI string, w http.ResponseWriter, r *
 		}
 		if res.StatusCode == http.StatusOK {
 			log.Printf("Requested URL for %s found at %s", requestURI, url)
-			http.Redirect(w, r, mirrorURL+requestURI, http.StatusTemporaryRedirect)
-			ms.Cache.SetEx(requestURI, mirrorURL+requestURI, 86400)
+			http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+			ms.Cache.SetEx(requestURI, url, 86400)
 			return
 		}
 
