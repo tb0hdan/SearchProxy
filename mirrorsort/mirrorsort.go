@@ -1,7 +1,10 @@
-package main
+package mirrorsort
 
 import (
 	"sort"
+
+	"searchproxy/httputil"
+	"searchproxy/workerpool"
 )
 
 type MirrorInfo struct {
@@ -16,7 +19,7 @@ func (a ByPing) Less(i, j int) bool { return a[i].PingMS < a[j].PingMS }
 
 func PingHTTPWrapper(item interface{}) interface{} {
 	url := item.(string)
-	return MirrorInfo{URL: url, PingMS: PingHTTP(url)}
+	return MirrorInfo{URL: url, PingMS: httputil.PingHTTP(url)}
 }
 
 func MirrorSort(urls []string) (result []string){
@@ -28,11 +31,17 @@ func MirrorSort(urls []string) (result []string){
 	for _, url := range urls {
 		repackURL = append(repackURL, url)
 	}
-	wp := NewWorkerPool(128, PingHTTPWrapper)
+	// FIXME: Obey system limits
+	wp := workerpool.NewWorkerPool(128, PingHTTPWrapper)
 	repackMirror = wp.ProcessItems(repackURL)
 
 	for _, mirror := range repackMirror {
-		mirrors = append(mirrors, mirror.(MirrorInfo))
+		mirrorInfo := mirror.(MirrorInfo)
+		// Add only working mirrors
+		if mirrorInfo.PingMS < 0 {
+			continue
+		}
+		mirrors = append(mirrors, mirrorInfo)
 	}
 
 	sort.Sort(ByPing(mirrors))

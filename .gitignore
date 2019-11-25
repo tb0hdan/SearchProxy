@@ -13,3 +13,9 @@
 
 # GoLand
 .idea/
+
+# Docker
+ssl/
+
+# built version
+searchproxy

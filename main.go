@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"searchproxy/memcache"
+	"searchproxy/mirrorsort"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -83,7 +84,7 @@ type MirrorConfig struct {
 }
 
 type MirrorsConfig struct {
-	Mirrors []MirrorConfig `mapstrcture:"mirrors"`
+	Mirrors []MirrorConfig `mapstructure:"mirrors"`
 }
 
 type SearchProxyServer struct {
@@ -136,14 +137,13 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 	}
 	var C MirrorsConfig
 
-	// fmt.Println(viper.Get("mirrors"))
 	err := viper.Unmarshal(&C)
 	if err != nil {
 		log.Fatalf("Unable to decode")
 	}
 	for _, cfg := range C.Mirrors {
 		log.Printf("Registering mirror `%s` with prefix `%s`\n", cfg.Name, cfg.Prefix)
-		sortedURLs := MirrorSort(cfg.URLs)
+		sortedURLs := mirrorsort.MirrorSort(cfg.URLs)
 		sps.RegisterMirrorsWithPrefix(sortedURLs, cfg.Prefix)
 	}
 	log.Println("SearchProxy started")

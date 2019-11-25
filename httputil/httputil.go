@@ -1,4 +1,4 @@
-package main
+package httputil
 
 import (
 	"net/http"
@@ -13,8 +13,8 @@ func PingHTTP(url string) (elapsed int64) {
 	elapsed = (time.Now().UnixNano() - start) / time.Millisecond.Nanoseconds()
 	if err != nil {
 		log.Debug("An error %v occured while running ping on %s", err, url)
-		// failed servers should be marked as slow
-		elapsed = 99999999999
+		// failed servers should be marked as slow, with negative values
+		elapsed = -1 * elapsed
 	} else {
 		res.Body.Close()
 	}
