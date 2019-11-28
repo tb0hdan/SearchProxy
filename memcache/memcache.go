@@ -58,25 +58,30 @@ func (mc *MemCacheType) Cache() (cache map[string]*ValueType) {
 	return
 }
 
+func (mc *MemCacheType) UnsafeDelete(key string) {
+	delete(mc.cache, key)
+}
 
 func (mc *MemCacheType) Delete(key string) {
 	mc.m.Lock()
-	delete(mc.cache, key)
+	mc.UnsafeDelete(key)
 	mc.m.Unlock()
 }
 
 func (mc *MemCacheType) Evictor() {
 	for {
+		mc.m.Lock()
 		for key, value := range mc.cache {
 			if value.Expires == 0 {
 				continue
 			}
 			if value.Expires - time.Now().Unix() <= 0 {
 				log.Printf("Evicting %s\n", key)
-				mc.Delete(key)
+				mc.UnsafeDelete(key)
 			}
 		}
-		time.Sleep(100 * time.Millisecond)
+		mc.m.Unlock()
+		time.Sleep(1 * time.Second)
 	}
 }
 

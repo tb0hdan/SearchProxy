@@ -17,5 +17,8 @@
 # Docker
 ssl/
 
+# Maxmind's DB
+*.mmdb
+
 # built version
 searchproxy
