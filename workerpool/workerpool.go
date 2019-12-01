@@ -7,15 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type WorkerPool struct {
-	Jobs        chan interface{}
-	Results     chan interface{}
-	WaitGroup   *sync.WaitGroup
-	WaitCh      chan bool
-	AllItemsCh  chan bool
-	WorkerCount int
-	Function    func(interface{}) interface{}
-}
 
 func (wp *WorkerPool) Worker(id int) {
 	for j := range wp.Jobs {
@@ -86,7 +77,7 @@ func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) 
 	return
 }
 
-func NewWorkerPool(workerCount int, fn func(item interface{}) interface{}) (wp *WorkerPool) {
+func New(workerCount int, fn func(item interface{}) interface{}) (wp *WorkerPool) {
 	wp = &WorkerPool{}
 	wp.Jobs = make(chan interface{})
 	wp.Results = make(chan interface{})

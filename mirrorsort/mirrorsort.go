@@ -1,19 +1,11 @@
 package mirrorsort
 
 import (
-	"log"
 	"sort"
 
-	"searchproxy/geoip"
-	"searchproxy/httputil"
 	"searchproxy/workerpool"
 )
 
-type MirrorInfo struct {
-	URL string
-	PingMS int64
-	GeoIPInfo *geoip.GeoIPInfo
-}
 type ByPing []MirrorInfo
 
 func (a ByPing) Len() int           { return len(a) }
@@ -22,12 +14,9 @@ func (a ByPing) Less(i, j int) bool { return a[i].PingMS < a[j].PingMS }
 
 func PingHTTPWrapper(item interface{}) interface{} {
 	url := item.(string)
-	db := &geoip.GeoIPDB{}
-	geoipinfo, err := db.LookupURL(url)
-	if err != nil {
-		log.Printf("PingHTTPWrapper %v\n", err)
-	}
-	return MirrorInfo{URL: url, PingMS: httputil.PingHTTP(url), GeoIPInfo: geoipinfo}
+	mirror := &MirrorInfo{URL: url}
+	mirror.Update()
+	return mirror
 }
 
 func MirrorSort(urls []string) (result []string){
@@ -40,7 +29,7 @@ func MirrorSort(urls []string) (result []string){
 		repackURL = append(repackURL, url)
 	}
 	// FIXME: Obey system limits
-	wp := workerpool.NewWorkerPool(128, PingHTTPWrapper)
+	wp := workerpool.New(128, PingHTTPWrapper)
 	repackMirror = wp.ProcessItems(repackURL)
 
 	for _, mirror := range repackMirror {
