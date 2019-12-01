@@ -50,8 +50,8 @@ func (sps *SearchProxyServer) serveRoot(w http.ResponseWriter, r *http.Request) 
 }
 
 func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
-	viper.SetConfigName("mirrors")
-	viper.AddConfigPath(".")
+	viper.SetConfigName(fpattern)
+	viper.AddConfigPath(fdir)
 	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -76,7 +76,7 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 	log.Println("SearchProxy started")
 }
 
-func NewSearchProxyServer(addr string, readTimeout, writeTimeout int) (sps *SearchProxyServer) {
+func New(addr string, readTimeout, writeTimeout int) (sps *SearchProxyServer) {
 	sps = &SearchProxyServer{
 		Addr:         addr,
 		ReadTimeout:  readTimeout,

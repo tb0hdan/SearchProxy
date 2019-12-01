@@ -21,7 +21,7 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	searchProxyServer := server.NewSearchProxyServer("0.0.0.0:8000", 30, 30)
+	searchProxyServer := server.New("0.0.0.0:8000", 30, 30)
 	searchProxyServer.ConfigFromFile("mirrors", ".")
 	searchProxyServer.Run()
 }
