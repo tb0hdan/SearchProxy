@@ -8,4 +8,5 @@ require (
 	github.com/oschwald/maxminddb-golang v1.5.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.5.0
+	github.com/umahmood/haversine v0.0.0-20151105152445-808ab04add26
 )

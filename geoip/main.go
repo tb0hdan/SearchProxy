@@ -1,14 +1,16 @@
 package geoip
 
 import (
+	"searchproxy/util"
+
 	"github.com/oschwald/geoip2-golang"
 	log "github.com/sirupsen/logrus"
+	"github.com/umahmood/haversine"
 
 	"net"
-	"net/url"
 )
 
-func (gdb *GeoIPDB) GeoIPLookupIP(ip string) (info *GeoIPInfo, err error){
+func (gdb *GeoIPDB) GeoIPLookupIP(ip string) (info *GeoIPInfo, err error) {
 	var (
 		ok bool
 		countryName,
@@ -39,14 +41,14 @@ func (gdb *GeoIPDB) GeoIPLookupIP(ip string) (info *GeoIPInfo, err error){
 	info = &GeoIPInfo{
 		CountryName: countryName,
 		CountryCode: record.Country.IsoCode,
-		CityName: cityName,
-		Latitude: record.Location.Latitude,
-		Longitude: record.Location.Longitude,
+		CityName:    cityName,
+		Latitude:    record.Location.Latitude,
+		Longitude:   record.Location.Longitude,
 	}
 	return
 }
 
-func (gdb *GeoIPDB) LookupIP(ip string) (geo *GeoIPInfo, err error){
+func (gdb *GeoIPDB) LookupIP(ip string) (geo *GeoIPInfo, err error) {
 	geo, err = gdb.GeoIPLookupIP(ip)
 	if err != nil {
 		log.Printf("Lookup failed with: %v\n", err)
@@ -65,14 +67,29 @@ func (gdb *GeoIPDB) LookupDomain(domain string) (*GeoIPInfo, error) {
 }
 
 func (gdb *GeoIPDB) LookupURL(rurl string) (*GeoIPInfo, error) {
-	parsed, err := url.Parse(rurl)
+	host, err := util.LookupHostByURL(rurl)
 	if err != nil {
-		log.Println("URL parse error")
 		return nil, err
 	}
-	return gdb.LookupDomain(parsed.Host)
+	return gdb.LookupDomain(host)
 }
 
-func New(DatabaseFile string) *GeoIPDB{
-	return &GeoIPDB{DatabaseFile:DatabaseFile}
+// Distance, in meters
+func (gdb *GeoIPDB) DistanceIP(ip1, ip2 string) (distance float64, err error) {
+	info1, err := gdb.GeoIPLookupIP(ip1)
+	if err != nil {
+		return -1, err
+	}
+	info2, err := gdb.GeoIPLookupIP(ip2)
+	if err != nil {
+		return -1, err
+	}
+	point1 := haversine.Coord{Lat: info1.Latitude, Lon: info1.Longitude}
+	point2 := haversine.Coord{Lat: info2.Latitude, Lon: info2.Longitude}
+	_, distance = haversine.Distance(point1, point2)
+	return distance * 1000, nil
+}
+
+func New(DatabaseFile string) *GeoIPDB {
+	return &GeoIPDB{DatabaseFile: DatabaseFile}
 }

@@ -2,9 +2,16 @@ package mirrorsort
 
 import "searchproxy/geoip"
 
-type MirrorInfo struct {
-	URL string
-	PingMS int64
-	GeoIPInfo *geoip.GeoIPInfo
+type MirrorStats struct {
+	// Timestamp
+	LastChecked int64
+	ConnectionsSinceStart int64
 }
 
+type MirrorInfo struct {
+	URL string
+	IP string
+	PingMS int64
+	GeoIPInfo *geoip.GeoIPInfo
+	Stats *MirrorStats
+}

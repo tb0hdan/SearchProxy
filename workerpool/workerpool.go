@@ -10,12 +10,12 @@ import (
 
 func (wp *WorkerPool) Worker(id int) {
 	for j := range wp.Jobs {
-		log.Debug("worker", id, "started  job", j)
+		log.Debugf("worker %d started job %v", id, j)
 		//
 		result := wp.Function(j)
 		wp.WaitGroup.Done()
 		//
-		log.Debug("worker", id, "finished job", j)
+		log.Debugf("worker %d finished job %v", id, j)
 		wp.Results <- result
 
 	}

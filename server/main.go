@@ -34,7 +34,7 @@ func (sps *SearchProxyServer) Run() {
 	log.Fatal(srv.ListenAndServe())
 }
 
-func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []string, prefix string) {
+func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.MirrorInfo, prefix string) {
 	cache := memcache.New()
 	ms := &MirrorServer{Cache: cache, Mirrors: mirrors, Prefix: prefix}
 	sps.Gorilla.PathPrefix(prefix).HandlerFunc(ms.CatchAllHandler)
@@ -70,10 +70,21 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 	}
 	for _, cfg := range C.Mirrors {
 		log.Printf("Registering mirror `%s` with prefix `%s`\n", cfg.Name, cfg.Prefix)
-		sortedURLs := mirrorsort.MirrorSort(cfg.URLs)
-		sps.RegisterMirrorsWithPrefix(sortedURLs, cfg.Prefix)
+		mirrors := mirrorsort.MirrorSort(cfg.URLs)
+		sps.RegisterMirrorsWithPrefix(mirrors, cfg.Prefix)
 	}
 	log.Println("SearchProxy started")
+}
+
+func (sps *SearchProxyServer) SetDebug(debug bool) {
+	if debug {
+		log.SetFormatter(&log.TextFormatter{
+			DisableColors: true,
+			FullTimestamp: true,
+		})
+		log.SetReportCaller(true)
+		log.SetLevel(log.DebugLevel)
+	}
 }
 
 func New(addr string, readTimeout, writeTimeout int) (sps *SearchProxyServer) {

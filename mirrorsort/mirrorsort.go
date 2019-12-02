@@ -6,7 +6,7 @@ import (
 	"searchproxy/workerpool"
 )
 
-type ByPing []MirrorInfo
+type ByPing []*MirrorInfo
 
 func (a ByPing) Len() int           { return len(a) }
 func (a ByPing) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
@@ -19,11 +19,11 @@ func PingHTTPWrapper(item interface{}) interface{} {
 	return mirror
 }
 
-func MirrorSort(urls []string) (result []string){
+func MirrorSort(urls []string) (result []*MirrorInfo){
 	var (
 		repackURL []interface{}
 		repackMirror []interface{}
-		mirrors []MirrorInfo
+		mirrors []*MirrorInfo
 	)
 	for _, url := range urls {
 		repackURL = append(repackURL, url)
@@ -33,7 +33,7 @@ func MirrorSort(urls []string) (result []string){
 	repackMirror = wp.ProcessItems(repackURL)
 
 	for _, mirror := range repackMirror {
-		mirrorInfo := mirror.(MirrorInfo)
+		mirrorInfo := mirror.(*MirrorInfo)
 		// Add only working mirrors
 		if mirrorInfo.PingMS < 0 {
 			continue
@@ -44,7 +44,7 @@ func MirrorSort(urls []string) (result []string){
 	sort.Sort(ByPing(mirrors))
 
 	for _, mirror := range mirrors {
-		result = append(result, mirror.URL)
+		result = append(result, mirror)
 	}
 	return
 }
