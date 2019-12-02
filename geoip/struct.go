@@ -1,14 +1,13 @@
 package geoip
 
-type GeoIPDB struct {
-	DatabaseFile string
+type DB struct {
+	file string
 }
 
-type GeoIPInfo struct {
+type Info struct {
 	CountryName string
 	CountryCode string
-	CityName string
-	Latitude float64
-	Longitude float64
+	CityName    string
+	Latitude    float64
+	Longitude   float64
 }
-

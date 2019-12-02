@@ -9,3 +9,5 @@ dockerimage:
 	@cp -r /usr/local/etc/openssl ./ssl
 	@docker build -t tb0hdan/searchproxy .
 
+lint:
+	@golangci-lint run --enable-all --disable=gosec

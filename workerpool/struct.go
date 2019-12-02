@@ -11,4 +11,3 @@ type WorkerPool struct {
 	WorkerCount int
 	Function    func(interface{}) interface{}
 }
-

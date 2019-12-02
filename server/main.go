@@ -1,5 +1,6 @@
 package server
 
+import "C"
 import (
 	"fmt"
 	"net/http"
@@ -44,35 +45,40 @@ func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.Mi
 func (sps *SearchProxyServer) serveRoot(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Hello normal index\n")
+
 	for _, proxy := range sps.Proxies {
 		fmt.Fprintf(w, "Endpoint: %s\n", proxy)
 	}
 }
 
 func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
+	var Config MirrorsConfig
+
 	viper.SetConfigName(fpattern)
 	viper.AddConfigPath(fdir)
 	viper.SetConfigType("yaml")
+
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Println("err!")
 			// Config file not found; ignore error if desired
+			log.Println("err!")
 		} else {
-			log.Println("err no parse!")
 			// Config file was found but another error was produced
+			log.Println("err no parse!")
 		}
 	}
-	var C MirrorsConfig
 
-	err := viper.Unmarshal(&C)
+	err := viper.Unmarshal(&Config)
 	if err != nil {
 		log.Fatalf("Unable to decode")
 	}
-	for _, cfg := range C.Mirrors {
+
+	for _, cfg := range Config.Mirrors {
 		log.Printf("Registering mirror `%s` with prefix `%s`\n", cfg.Name, cfg.Prefix)
 		mirrors := mirrorsort.MirrorSort(cfg.URLs)
 		sps.RegisterMirrorsWithPrefix(mirrors, cfg.Prefix)
 	}
+
 	log.Println("SearchProxy started")
 }
 
@@ -87,15 +93,21 @@ func (sps *SearchProxyServer) SetDebug(debug bool) {
 	}
 }
 
+func (sps *SearchProxyServer) Stop() {
+	// no code yet
+}
+
 func New(addr string, readTimeout, writeTimeout int) (sps *SearchProxyServer) {
 	sps = &SearchProxyServer{
 		Addr:         addr,
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
+		Gorilla:      mux.NewRouter(),
 	}
-	sps.Gorilla = mux.NewRouter()
+
 	sps.Gorilla.HandleFunc("/", sps.serveRoot)
 	sps.Gorilla.HandleFunc("/index.htm", sps.serveRoot)
 	sps.Gorilla.HandleFunc("/index.html", sps.serveRoot)
+
 	return
 }

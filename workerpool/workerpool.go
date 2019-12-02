@@ -7,7 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-
 func (wp *WorkerPool) Worker(id int) {
 	for j := range wp.Jobs {
 		log.Debugf("worker %d started job %v", id, j)
@@ -17,7 +16,6 @@ func (wp *WorkerPool) Worker(id int) {
 		//
 		log.Debugf("worker %d finished job %v", id, j)
 		wp.Results <- result
-
 	}
 }
 
@@ -43,7 +41,6 @@ func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) 
 			if needBreak {
 				break
 			}
-
 		}
 		log.Debug("reader exit")
 	}()
@@ -56,6 +53,7 @@ func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) 
 	}()
 
 	wp.WaitGroup.Add(len(items))
+
 	for w := 1; w <= wp.WorkerCount; w++ {
 		go wp.Worker(w)
 	}
@@ -63,6 +61,7 @@ func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) 
 	for _, item := range items {
 		wp.Jobs <- item
 	}
+
 	log.Debug("close reached")
 	close(wp.Jobs)
 
@@ -74,7 +73,8 @@ func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) 
 	}
 
 	log.Debug("return")
-	return
+
+	return results
 }
 
 func New(workerCount int, fn func(item interface{}) interface{}) (wp *WorkerPool) {
@@ -86,6 +86,6 @@ func New(workerCount int, fn func(item interface{}) interface{}) (wp *WorkerPool
 	wp.WaitGroup = &sync.WaitGroup{}
 	wp.WorkerCount = workerCount
 	wp.Function = fn
+
 	return wp
 }
-

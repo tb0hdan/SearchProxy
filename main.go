@@ -6,9 +6,9 @@ import (
 	"searchproxy/server"
 )
 
-var debug = flag.Bool("debug", false, "enable debug")
-
 func main() {
+	var debug = flag.Bool("debug", false, "enable debug")
+
 	flag.Parse()
 
 	searchProxyServer := server.New("0.0.0.0:8000", 30, 30)
