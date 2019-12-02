@@ -77,15 +77,14 @@ func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) 
 	return results
 }
 
-func New(workerCount int, fn func(item interface{}) interface{}) (wp *WorkerPool) {
-	wp = &WorkerPool{}
-	wp.Jobs = make(chan interface{})
-	wp.Results = make(chan interface{})
-	wp.WaitCh = make(chan bool)
-	wp.AllItemsCh = make(chan bool)
-	wp.WaitGroup = &sync.WaitGroup{}
-	wp.WorkerCount = workerCount
-	wp.Function = fn
-
-	return wp
+func New(workerCount int, fn func(item interface{}) interface{}) *WorkerPool {
+	return &WorkerPool{
+		Jobs:        make(chan interface{}),
+		Results:     make(chan interface{}),
+		WaitCh:      make(chan bool),
+		AllItemsCh:  make(chan bool),
+		WaitGroup:   &sync.WaitGroup{},
+		WorkerCount: workerCount,
+		Function:    fn,
+	}
 }

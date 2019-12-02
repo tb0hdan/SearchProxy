@@ -23,7 +23,7 @@ func (mi *MirrorInfo) UpdateIP() {
 }
 
 func (mi *MirrorInfo) UpdateGeo() {
-	db := geoip.New("GeoLite2-City.mmdb")
+	db := geoip.New(mi.GeoIPDBFile)
 	geoipinfo, err := db.LookupURL(mi.URL)
 
 	if err != nil {
@@ -40,9 +40,9 @@ func (mi *MirrorInfo) Update() {
 }
 
 func (mi *MirrorInfo) PlusConnection() {
-	if mi.Stats == nil {
-		mi.Stats = &MirrorStats{}
-	}
-
 	mi.Stats.ConnectionsSinceStart++
+}
+
+func NewMirror(url, geoIPDBFile string) *MirrorInfo {
+	return &MirrorInfo{URL: url, Stats: &MirrorStats{}, GeoIPDBFile: geoIPDBFile}
 }

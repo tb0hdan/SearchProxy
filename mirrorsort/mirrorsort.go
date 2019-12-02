@@ -14,15 +14,19 @@ func (a ByPing) Len() int           { return len(a) }
 func (a ByPing) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByPing) Less(i, j int) bool { return a[i].PingMS < a[j].PingMS }
 
-func PingHTTPWrapper(item interface{}) interface{} {
+type Sorter struct {
+	GeoIPDBFile string
+}
+
+func (srt *Sorter) PingHTTPWrapper(item interface{}) interface{} {
 	url := item.(string)
-	mirror := &MirrorInfo{URL: url}
+	mirror := NewMirror(url, srt.GeoIPDBFile)
 	mirror.Update()
 
 	return mirror
 }
 
-func MirrorSort(urls []string) (mirrors []*MirrorInfo) {
+func (srt *Sorter) MirrorSort(urls []string) (mirrors []*MirrorInfo) {
 	var (
 		repackMirror []interface{}
 		repackURL    = make([]interface{}, 0, len(urls))
@@ -40,13 +44,13 @@ func MirrorSort(urls []string) (mirrors []*MirrorInfo) {
 		workerCount = 1024
 	}
 
-	wp := workerpool.New(workerCount, PingHTTPWrapper)
+	wp := workerpool.New(workerCount, srt.PingHTTPWrapper)
 	repackMirror = wp.ProcessItems(repackURL)
 
 	for _, mirror := range repackMirror {
 		mirrorInfo := mirror.(*MirrorInfo)
 		// Add only working mirrors
-		if mirrorInfo.PingMS < network.MirrorUnreachable {
+		if mirrorInfo.PingMS <= network.MirrorUnreachable {
 			continue
 		}
 
@@ -56,4 +60,8 @@ func MirrorSort(urls []string) (mirrors []*MirrorInfo) {
 	sort.Sort(ByPing(mirrors))
 
 	return mirrors
+}
+
+func NewSorter(geoIPDBFile string) *Sorter {
+	return &Sorter{GeoIPDBFile: geoIPDBFile}
 }

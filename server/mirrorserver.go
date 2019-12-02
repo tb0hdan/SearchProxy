@@ -14,9 +14,10 @@ import (
 )
 
 type MirrorServer struct {
-	Cache   *memcache.CacheType
-	Mirrors []*mirrorsort.MirrorInfo
-	Prefix  string
+	Cache       *memcache.CacheType
+	Mirrors     []*mirrorsort.MirrorInfo
+	Prefix      string
+	GeoIPDBFile string
 }
 
 func (ms *MirrorServer) StripRequestURI(requestURI string) (result string) {
@@ -80,7 +81,7 @@ func (ms *MirrorServer) GetDistanceRemoteMirror(r *http.Request, mirror *mirrors
 		return 0
 	}
 
-	geo := geoip.New("GeoLite2-City.mmdb")
+	geo := geoip.New(ms.GeoIPDBFile)
 
 	if mirror.GeoIPInfo == nil {
 		return -1

@@ -21,6 +21,7 @@ type SearchProxyServer struct {
 	ReadTimeout  int
 	WriteTimeout int
 	Proxies      []string
+	GeoIPDBFile  string
 }
 
 func (sps *SearchProxyServer) Run() {
@@ -37,7 +38,7 @@ func (sps *SearchProxyServer) Run() {
 
 func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.MirrorInfo, prefix string) {
 	cache := memcache.New()
-	ms := &MirrorServer{Cache: cache, Mirrors: mirrors, Prefix: prefix}
+	ms := &MirrorServer{Cache: cache, Mirrors: mirrors, Prefix: prefix, GeoIPDBFile: sps.GeoIPDBFile}
 	sps.Gorilla.PathPrefix(prefix).HandlerFunc(ms.CatchAllHandler)
 	sps.Proxies = append(sps.Proxies, prefix)
 }
@@ -73,9 +74,11 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 		log.Fatalf("Unable to decode")
 	}
 
+	sorter := mirrorsort.NewSorter(sps.GeoIPDBFile)
+
 	for _, cfg := range Config.Mirrors {
 		log.Printf("Registering mirror `%s` with prefix `%s`\n", cfg.Name, cfg.Prefix)
-		mirrors := mirrorsort.MirrorSort(cfg.URLs)
+		mirrors := sorter.MirrorSort(cfg.URLs)
 		sps.RegisterMirrorsWithPrefix(mirrors, cfg.Prefix)
 	}
 
@@ -91,6 +94,10 @@ func (sps *SearchProxyServer) SetDebug(debug bool) {
 		log.SetReportCaller(true)
 		log.SetLevel(log.DebugLevel)
 	}
+}
+
+func (sps *SearchProxyServer) SetGeoIPDBFile(dbFile string) {
+	sps.GeoIPDBFile = dbFile
 }
 
 func (sps *SearchProxyServer) Stop() {

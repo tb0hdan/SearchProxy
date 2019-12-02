@@ -9,9 +9,10 @@ type MirrorStats struct {
 }
 
 type MirrorInfo struct {
-	URL       string
-	IP        string
-	PingMS    int64
-	GeoIPInfo *geoip.Info
-	Stats     *MirrorStats
+	URL         string
+	IP          string
+	PingMS      int64
+	GeoIPInfo   *geoip.Info
+	GeoIPDBFile string
+	Stats       *MirrorStats
 }
