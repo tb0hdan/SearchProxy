@@ -4,6 +4,7 @@ import "C"
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"searchproxy/memcache"
@@ -98,6 +99,10 @@ func (sps *SearchProxyServer) SetDebug(debug bool) {
 
 func (sps *SearchProxyServer) SetGeoIPDBFile(dbFile string) {
 	sps.GeoIPDBFile = dbFile
+
+	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
+		log.Fatalf("Cannot start with non-existing GeoIP DB file: %s", dbFile)
+	}
 }
 
 func (sps *SearchProxyServer) Stop() {
