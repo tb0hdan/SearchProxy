@@ -1,10 +1,15 @@
 # SearchProxy
-Search for files on mirrors and redirect to matching one
+This project offers functionality similar to HAProxy/Nginx though it checks for file
+presence prior to returning redirect to respective upstream. Mainly intended for
+opensource mirrors but can be used (possibly) as a CDN frontend.
 
+Returns fastest (lowest HTTP ping) upstream so far.
 
 ## Running
 
-`go run *.go`
+`make`
+
+`./searchproxy`
 
 `wget http://localhost:8000/gentoo/distfiles/01-iosevka-1.14.1.zip`
 
