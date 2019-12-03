@@ -21,12 +21,12 @@ type CacheType struct {
 
 func (mc *CacheType) Get(key string) (value string, ok bool) {
 	mc.m.RLock()
+	defer mc.m.RUnlock()
 	valueType, ok := mc.cache[key]
 
 	if ok {
 		value = valueType.Value
 	}
-	mc.m.RUnlock()
 
 	return
 }
@@ -37,6 +37,8 @@ func (mc *CacheType) Set(key, value string) {
 
 func (mc *CacheType) SetEx(key, value string, expires int64) {
 	mc.m.Lock()
+	defer mc.m.Unlock()
+
 	if expires > 0 {
 		expires += time.Now().Unix()
 	}
@@ -45,7 +47,6 @@ func (mc *CacheType) SetEx(key, value string, expires int64) {
 		Value:   value,
 		Expires: expires,
 	}
-	mc.m.Unlock()
 }
 
 func (mc *CacheType) Len() (cacheSize int) {
@@ -64,8 +65,9 @@ func (mc *CacheType) UnsafeDelete(key string) {
 
 func (mc *CacheType) Delete(key string) {
 	mc.m.Lock()
+	defer mc.m.Unlock()
+
 	mc.UnsafeDelete(key)
-	mc.m.Unlock()
 }
 
 func (mc *CacheType) Evictor() {
