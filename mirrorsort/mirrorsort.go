@@ -3,6 +3,7 @@ package mirrorsort
 import (
 	"sort"
 
+	"searchproxy/util/miscellaneous"
 	"searchproxy/util/network"
 	"searchproxy/util/system"
 	"searchproxy/workerpool"
@@ -16,11 +17,12 @@ func (a ByPing) Less(i, j int) bool { return a[i].PingMS < a[j].PingMS }
 
 type Sorter struct {
 	GeoIPDBFile string
+	BuildInfo   *miscellaneous.BuildInfo
 }
 
 func (srt *Sorter) PingHTTPWrapper(item interface{}) interface{} {
 	url := item.(string)
-	mirror := NewMirror(url, srt.GeoIPDBFile)
+	mirror := NewMirror(url, srt.GeoIPDBFile, srt.BuildInfo)
 	mirror.Update()
 
 	return mirror
@@ -62,6 +64,9 @@ func (srt *Sorter) MirrorSort(urls []string) (mirrors []*MirrorInfo) {
 	return mirrors
 }
 
-func NewSorter(geoIPDBFile string) *Sorter {
-	return &Sorter{GeoIPDBFile: geoIPDBFile}
+func NewSorter(geoIPDBFile string, buildInfo *miscellaneous.BuildInfo) *Sorter {
+	return &Sorter{
+		GeoIPDBFile: geoIPDBFile,
+		BuildInfo:   buildInfo,
+	}
 }

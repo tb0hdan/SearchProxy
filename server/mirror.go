@@ -9,6 +9,8 @@ import (
 	"searchproxy/geoip"
 	"searchproxy/memcache"
 	"searchproxy/mirrorsort"
+	"searchproxy/util/miscellaneous"
+	"searchproxy/util/network"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -18,9 +20,10 @@ type MirrorServer struct {
 	Mirrors     []*mirrorsort.MirrorInfo
 	Prefix      string
 	GeoIPDBFile string
+	BuildInfo   *miscellaneous.BuildInfo
 }
 
-func (ms *MirrorServer) StripRequestURI(requestURI string) (result string) {
+func (ms *MirrorServer) stripRequestURI(requestURI string) (result string) {
 	result = strings.TrimLeft(requestURI, ms.Prefix)
 	if !strings.HasPrefix(result, "/") {
 		result = "/" + result
@@ -30,7 +33,7 @@ func (ms *MirrorServer) StripRequestURI(requestURI string) (result string) {
 }
 
 func (ms *MirrorServer) CatchAllHandler(w http.ResponseWriter, r *http.Request) {
-	strippedURI := ms.StripRequestURI(r.RequestURI)
+	strippedURI := ms.stripRequestURI(r.RequestURI)
 	if strippedURI == "/" || strippedURI == "/index.htm" || strippedURI == "/index.html" {
 		ms.serveRoot(w, r)
 		return
@@ -98,8 +101,14 @@ func (ms *MirrorServer) GetDistanceRemoteMirror(r *http.Request, mirror *mirrors
 	return distance
 }
 
+func (ms *MirrorServer) CheckMirror(mirrorURL string) (res *http.Response, err error) {
+	// This method will be extended with rate limiting a little bit later
+	myHTTP := network.NewHTTPUtilities(ms.BuildInfo)
+	return myHTTP.HTTPHEAD(mirrorURL)
+}
+
 func (ms *MirrorServer) findMirror(requestURI string, w http.ResponseWriter, r *http.Request) {
-	requestURI = ms.StripRequestURI(requestURI)
+	requestURI = ms.stripRequestURI(requestURI)
 
 	if value, ok := ms.Cache.Get(requestURI); ok {
 		log.Printf("Cached URL for %s found at %s", requestURI, value)
@@ -117,7 +126,7 @@ func (ms *MirrorServer) findMirror(requestURI string, w http.ResponseWriter, r *
 		log.Println(ms.GetDistanceRemoteMirror(r, mirror))
 		url := strings.TrimRight(mirror.URL, "/") + requestURI
 
-		res, err := http.Head(url)
+		res, err := ms.CheckMirror(url)
 
 		if err != nil {
 			log.Println(err)

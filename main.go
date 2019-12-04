@@ -6,6 +6,15 @@ import (
 	"strings"
 
 	"searchproxy/server"
+	"searchproxy/util/miscellaneous"
+)
+
+// Global vars for versioning
+var (
+	Build     = "unset" // nolint
+	BuildDate = "unset" // nolint
+	GoVersion = "unset" // nolint
+	Version   = "unset" // nolint
 )
 
 func main() {
@@ -20,7 +29,13 @@ func main() {
 
 	flag.Parse()
 
-	searchProxyServer := server.New(*bind, *readTimeout, *writeTimeout)
+	buildInfo := &miscellaneous.BuildInfo{
+		Build:     Build,
+		BuildDate: BuildDate,
+		GoVersion: GoVersion,
+		Version:   Version,
+	}
+	searchProxyServer := server.New(*bind, *readTimeout, *writeTimeout, buildInfo)
 	searchProxyServer.SetDebug(*debug)
 	searchProxyServer.SetGeoIPDBFile(*geoIPDBFile)
 

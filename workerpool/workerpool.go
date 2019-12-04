@@ -29,7 +29,7 @@ func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) 
 				log.Debug("result!")
 			case <-wp.AllItemsCh:
 				log.Debug("All items!")
-				wp.WaitCh <- true
+				wp.WaitCh <- struct{}{}
 				needBreak = true
 				break
 			case <-wp.WaitCh:
@@ -48,7 +48,7 @@ func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) 
 	// All items done, signal exit
 	go func() {
 		wp.WaitGroup.Wait()
-		wp.AllItemsCh <- true
+		wp.AllItemsCh <- struct{}{}
 		log.Debug("Wooo!")
 	}()
 
@@ -81,8 +81,8 @@ func New(workerCount int, fn func(item interface{}) interface{}) *WorkerPool {
 	return &WorkerPool{
 		Jobs:        make(chan interface{}),
 		Results:     make(chan interface{}),
-		WaitCh:      make(chan bool),
-		AllItemsCh:  make(chan bool),
+		WaitCh:      make(chan struct{}),
+		AllItemsCh:  make(chan struct{}),
 		WaitGroup:   &sync.WaitGroup{},
 		WorkerCount: workerCount,
 		Function:    fn,

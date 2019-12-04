@@ -1,6 +1,9 @@
 package mirrorsort
 
-import "searchproxy/geoip"
+import (
+	"searchproxy/geoip"
+	"searchproxy/util/miscellaneous"
+)
 
 type MirrorStats struct {
 	// Timestamp
@@ -15,4 +18,5 @@ type MirrorInfo struct {
 	GeoIPInfo   *geoip.Info
 	GeoIPDBFile string
 	Stats       *MirrorStats
+	BuildInfo   *miscellaneous.BuildInfo
 }

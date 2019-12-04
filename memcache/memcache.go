@@ -16,7 +16,7 @@ type CacheType struct {
 	cache  map[string]*ValueType
 	m      sync.RWMutex
 	ticker *time.Ticker
-	done   chan bool
+	done   chan struct{}
 }
 
 func (mc *CacheType) Get(key string) (value string, ok bool) {
@@ -94,14 +94,14 @@ func (mc *CacheType) Evictor() {
 
 func (mc *CacheType) Stop() {
 	mc.ticker.Stop()
-	mc.done <- true
+	mc.done <- struct{}{}
 
 	log.Debug("Memcache is saying goodbye!")
 }
 
 func New() (memCache *CacheType) {
 	memCache = &CacheType{cache: make(map[string]*ValueType),
-		done:   make(chan bool),
+		done:   make(chan struct{}),
 		ticker: time.NewTicker(1 * time.Second),
 	}
 	go memCache.Evictor()

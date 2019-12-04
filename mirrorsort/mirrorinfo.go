@@ -1,6 +1,7 @@
 package mirrorsort
 
 import (
+	"searchproxy/util/miscellaneous"
 	"searchproxy/util/network"
 
 	log "github.com/sirupsen/logrus"
@@ -9,7 +10,8 @@ import (
 )
 
 func (mi *MirrorInfo) UpdateMS() {
-	mi.PingMS = network.PingHTTP(mi.URL)
+	myHTTP := network.NewHTTPUtilities(mi.BuildInfo)
+	mi.PingMS = myHTTP.PingHTTP(mi.URL)
 }
 
 func (mi *MirrorInfo) UpdateIP() {
@@ -24,13 +26,13 @@ func (mi *MirrorInfo) UpdateIP() {
 
 func (mi *MirrorInfo) UpdateGeo() {
 	db := geoip.New(mi.GeoIPDBFile)
-	geoipinfo, err := db.LookupURL(mi.URL)
+	geoIPInfo, err := db.LookupURL(mi.URL)
 
 	if err != nil {
 		log.Printf("UpdateGeo %v\n", err)
 	}
 
-	mi.GeoIPInfo = geoipinfo
+	mi.GeoIPInfo = geoIPInfo
 }
 
 func (mi *MirrorInfo) Update() {
@@ -43,6 +45,11 @@ func (mi *MirrorInfo) PlusConnection() {
 	mi.Stats.ConnectionsSinceStart++
 }
 
-func NewMirror(url, geoIPDBFile string) *MirrorInfo {
-	return &MirrorInfo{URL: url, Stats: &MirrorStats{}, GeoIPDBFile: geoIPDBFile}
+func NewMirror(url, geoIPDBFile string, buildInfo *miscellaneous.BuildInfo) *MirrorInfo {
+	return &MirrorInfo{
+		URL:         url,
+		Stats:       &MirrorStats{},
+		GeoIPDBFile: geoIPDBFile,
+		BuildInfo:   buildInfo,
+	}
 }

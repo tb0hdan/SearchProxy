@@ -1,10 +1,15 @@
 all: build
 
+BUILD = $(shell git rev-parse HEAD)
+BDATE = $(shell date -u '+%Y-%m-%d_%I:%M:%S%p_UTC')
+GO_VERSION = $(shell go version|awk '{print $$3}')
+VERSION = $(shell cat ./VERSION)
+
 TESTS = test-geoip test-memcache test-mirrorsort test-server test-util/network test-util/system test-workerpool
 
 build:
 	@go mod why
-	@go build -v -x -ldflags "-s -w" -o searchproxy *.go
+	@go build -v -x -ldflags "-s -w -X main.Build=$(BUILD) -X main.BuildDate=$(BDATE) -X main.GoVersion=$(GO_VERSION) -X main.Version=$(VERSION)" -o searchproxy *.go
 
 dockerimage:
 	@cp -r /usr/local/etc/openssl ./ssl
