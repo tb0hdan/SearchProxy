@@ -17,6 +17,11 @@ or
 
 `wget http://localhost:8000/debian/ls-lR.gz`
 
+## Upstream proxy support
+SearchProxy uses Go's built-in http client with HTTP proxy support. In order to send all
+requests through a proxy, export environment variable like this:
+
+`export HTTP_PROXY=http://example.com:8000`
 
 ## GeoIP notice
 This project uses [GeoIP2-Golang](https://github.com/oschwald/geoip2-golang) which in turn
