@@ -1,25 +1,12 @@
 package memcache
 
 import (
-	"sync"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type ValueType struct {
-	Value   string
-	Expires int64
-}
-
-type CacheType struct {
-	cache  map[string]*ValueType
-	m      sync.RWMutex
-	ticker *time.Ticker
-	done   chan struct{}
-}
-
-func (mc *CacheType) Get(key string) (value string, ok bool) {
+func (mc *CacheType) Get(key string) (value interface{}, ok bool) {
 	mc.m.RLock()
 	defer mc.m.RUnlock()
 	valueType, ok := mc.cache[key]

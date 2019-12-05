@@ -3,6 +3,7 @@ package network
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"searchproxy/util/miscellaneous"
@@ -52,4 +53,13 @@ func (hu *HTTPUtilities) PingHTTP(url string) (elapsed int64) {
 
 func NewHTTPUtilities(buildInfo *miscellaneous.BuildInfo) *HTTPUtilities {
 	return &HTTPUtilities{BuildInfo: buildInfo}
+}
+
+func StripRequestURI(requestURI, prefix string) (result string) {
+	result = strings.TrimLeft(requestURI, prefix)
+	if !strings.HasPrefix(result, "/") {
+		result = "/" + result
+	}
+
+	return
 }

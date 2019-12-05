@@ -41,3 +41,36 @@ func LookupIPByURL(rurl string) (ips []net.IP, err error) {
 
 	return ips, nil
 }
+
+func IsLocalNetwork(ip net.IP) (result bool) {
+	LocalNetworks := []string{
+		"10.0.0.1/8",
+		"127.0.0.1/8",
+		"172.16.0.1/12",
+		"192.168.0.0/16",
+	}
+
+	for _, network := range LocalNetworks {
+		_, ipnet, err := net.ParseCIDR(network)
+		if err != nil {
+			// cannot and should not happen, but still
+			log.Fatalf("LocalNetworks is broken!!!! %v", err)
+		}
+
+		if ipnet.Contains(ip) {
+			result = true
+			break
+		}
+	}
+	// IP didn't match any of local network definitions above, could be IPv6 loopback, go with built-in method
+	if !result {
+		result = ip.IsLoopback()
+	}
+
+	return result
+}
+
+func IsLocalNetworkString(ipAddress string) (result bool) {
+	// convenience method
+	return IsLocalNetwork(net.ParseIP(ipAddress))
+}

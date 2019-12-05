@@ -22,16 +22,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type SearchProxyServer struct {
-	Gorilla      *mux.Router
-	Addr         string
-	ReadTimeout  int
-	WriteTimeout int
-	Proxies      []string
-	GeoIPDBFile  string
-	BuildInfo    *miscellaneous.BuildInfo
-}
-
 func (sps *SearchProxyServer) Run() {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -75,15 +65,17 @@ func (sps *SearchProxyServer) setupRateLimitMiddleWare() (middleWare *limiter.Li
 	return
 }
 
-func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.MirrorInfo, prefix string) {
+func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.MirrorInfo, prefix, algorithm string) {
 	cache := memcache.New()
-	ms := &MirrorServer{
-		Cache:       cache,
-		Mirrors:     mirrors,
-		Prefix:      prefix,
-		GeoIPDBFile: sps.GeoIPDBFile,
-		BuildInfo:   sps.BuildInfo,
+	msConfig := &MirrorServerConfig{
+		Cache:           cache,
+		Mirrors:         mirrors,
+		Prefix:          prefix,
+		GeoIPDBFile:     sps.GeoIPDBFile,
+		BuildInfo:       sps.BuildInfo,
+		SearchAlgorithm: algorithm,
 	}
+	ms := NewMirrorServer(msConfig)
 	middleWare := sps.setupRateLimitMiddleWare()
 	sps.Gorilla.PathPrefix(prefix).Handler(tollbooth.LimitFuncHandler(middleWare, ms.CatchAllHandler))
 	sps.Proxies = append(sps.Proxies, prefix)
@@ -99,7 +91,10 @@ func (sps *SearchProxyServer) serveRoot(w http.ResponseWriter, r *http.Request) 
 }
 
 func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
-	var Config MirrorsConfig
+	var (
+		Config    MirrorsConfig
+		algorithm = "first"
+	)
 
 	viper.SetConfigName(fpattern)
 	viper.AddConfigPath(fdir)
@@ -125,7 +120,7 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 	for _, cfg := range Config.Mirrors {
 		log.Printf("[i] Registering mirror `%s` with prefix `%s`\n", cfg.Name, cfg.Prefix)
 		mirrors := sorter.MirrorSort(cfg.URLs)
-		sps.RegisterMirrorsWithPrefix(mirrors, cfg.Prefix)
+		sps.RegisterMirrorsWithPrefix(mirrors, cfg.Prefix, algorithm)
 	}
 
 	log.Println("[i] Mirror registration complete")
