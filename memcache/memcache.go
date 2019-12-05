@@ -18,11 +18,11 @@ func (mc *CacheType) Get(key string) (value interface{}, ok bool) {
 	return
 }
 
-func (mc *CacheType) Set(key, value string) {
+func (mc *CacheType) Set(key string, value interface{}) {
 	mc.SetEx(key, value, 0)
 }
 
-func (mc *CacheType) SetEx(key, value string, expires int64) {
+func (mc *CacheType) SetEx(key string, value interface{}, expires int64) {
 	mc.m.Lock()
 	defer mc.m.Unlock()
 
