@@ -37,9 +37,10 @@ type MirrorServerConfig struct {
 }
 
 type MirrorConfig struct {
-	Name   string   `mapstructure:"name"`
-	Prefix string   `mapstructure:"prefix"`
-	URLs   []string `mapstructure:"urls"`
+	Name      string   `mapstructure:"name"`
+	Prefix    string   `mapstructure:"prefix"`
+	Algorithm string   `mapstructure:"algorithm"`
+	URLs      []string `mapstructure:"urls"`
 }
 
 type MirrorsConfig struct {

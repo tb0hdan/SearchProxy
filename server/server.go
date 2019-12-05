@@ -91,11 +91,11 @@ func (sps *SearchProxyServer) serveRoot(w http.ResponseWriter, r *http.Request) 
 }
 
 func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
-	var (
-		Config    MirrorsConfig
-		algorithm = "first"
-	)
+	const DefaultAlgorithm = "first"
 
+	var Config MirrorsConfig
+
+	viper.SetDefault(".algorithm", "first")
 	viper.SetConfigName(fpattern)
 	viper.AddConfigPath(fdir)
 	viper.SetConfigType("yaml")
@@ -120,7 +120,12 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 	for _, cfg := range Config.Mirrors {
 		log.Printf("[i] Registering mirror `%s` with prefix `%s`\n", cfg.Name, cfg.Prefix)
 		mirrors := sorter.MirrorSort(cfg.URLs)
-		sps.RegisterMirrorsWithPrefix(mirrors, cfg.Prefix, algorithm)
+
+		if cfg.Algorithm == "" {
+			cfg.Algorithm = DefaultAlgorithm
+		}
+
+		sps.RegisterMirrorsWithPrefix(mirrors, cfg.Prefix, cfg.Algorithm)
 	}
 
 	log.Println("[i] Mirror registration complete")
