@@ -4,6 +4,7 @@ import (
 	"searchproxy/util/miscellaneous"
 	"searchproxy/util/network"
 
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
 	"searchproxy/geoip"
@@ -35,10 +36,20 @@ func (mi *MirrorInfo) UpdateGeo() {
 	mi.GeoIPInfo = geoIPInfo
 }
 
+func (mi *MirrorInfo) UpdateUUID() {
+	uuid4, err := uuid.NewRandom()
+	if err != nil {
+		log.Fatalf("could not generate UUID: %v", err)
+	}
+
+	mi.UUID = uuid4.String()
+}
+
 func (mi *MirrorInfo) Update() {
 	mi.UpdateMS()
 	mi.UpdateGeo()
 	mi.UpdateIP()
+	mi.UpdateUUID()
 }
 
 func (mi *MirrorInfo) PlusConnection() {

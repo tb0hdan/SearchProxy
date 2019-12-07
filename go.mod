@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/didip/tollbooth v4.0.2+incompatible
+	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.3
 	github.com/oschwald/geoip2-golang v1.3.0
 	github.com/oschwald/maxminddb-golang v1.5.0 // indirect

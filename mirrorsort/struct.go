@@ -19,6 +19,7 @@ type MirrorInfo struct {
 	GeoIPDBFile string
 	Stats       *MirrorStats
 	BuildInfo   *miscellaneous.BuildInfo
+	UUID        string
 	// Used for closes mirror search, calculated only then
 	Distance float64
 }

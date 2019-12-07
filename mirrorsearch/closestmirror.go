@@ -11,7 +11,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (ms *MirrorSearch) FindClosestMirror(requestURI string, w http.ResponseWriter, r *http.Request) {
+type MirrorCache struct {
+	KnownURLs map[string]bool
+}
+
+func (ms *MirrorSearch) FindClosestMirror(requestURI string, w http.ResponseWriter, r *http.Request) { //nolint
 	requestURI = network.StripRequestURI(requestURI, ms.Prefix)
 
 	repackedMirrors := make([]*mirrorsort.MirrorInfo, 0)
@@ -24,14 +28,40 @@ func (ms *MirrorSearch) FindClosestMirror(requestURI string, w http.ResponseWrit
 		}
 		// This is unacceptably slow atm, use cache later
 		url := strings.TrimRight(mirror.URL, "/") + requestURI
-		res, err := ms.CheckMirror(url)
 
-		// Not found
-		if err != nil {
-			log.Println(err)
-			continue
+		if value, ok := ms.Cache.Get(mirror.UUID); !ok {
+			res, err := ms.CheckMirror(url)
+
+			// Not found
+			if err != nil {
+				log.Println(err)
+				continue
+			} else {
+				res.Body.Close()
+			}
+
+			mc := &MirrorCache{KnownURLs: map[string]bool{
+				url: true,
+			}}
+			ms.Cache.SetEx(mirror.UUID, mc, 86400)
 		} else {
-			res.Body.Close()
+			mirrorCache := value.(*MirrorCache)
+			if _, ok := mirrorCache.KnownURLs[url]; ok {
+				// URL is known
+				log.Debugf("Found matching URL in cache: %s", url)
+			} else {
+				// URL is unknown
+				res, err := ms.CheckMirror(url)
+				if err != nil {
+					log.Println(err)
+					continue
+				} else {
+					res.Body.Close()
+					if res.StatusCode == http.StatusOK {
+						mirrorCache.KnownURLs[url] = true
+					}
+				}
+			}
 		}
 
 		mirror.Distance = distance
@@ -43,7 +73,7 @@ func (ms *MirrorSearch) FindClosestMirror(requestURI string, w http.ResponseWrit
 	if len(repackedMirrors) > 0 {
 		mirror := repackedMirrors[0]
 		url := strings.TrimRight(mirror.URL, "/") + requestURI
-		log.Printf("Requested URL for %s found at %s with distance %d", requestURI, url, int(mirror.Distance))
+		log.Printf("Requested URL for %s found at %s with distance %d km", requestURI, url, int(mirror.Distance))
 		ms.Redirect(mirror, url, w, r)
 
 		return
