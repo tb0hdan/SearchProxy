@@ -20,8 +20,6 @@ mirrors:
       - "http://gentoo.mirrors.tera-byte.com/"
 ```
 
-Returns fastest (lowest HTTP ping) upstream so far.
-
 ## Running
 
 `make`
