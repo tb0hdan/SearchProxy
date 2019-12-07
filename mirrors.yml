@@ -1,7 +1,7 @@
 mirrors:
   - name: "gentoo"
     prefix: "/gentoo"
-    algorithm: "first"
+    algorithm: "closest"
     urls:
       - "http://gentoo.mirrors.tera-byte.com/"
       - "http://gentoo.gossamerhost.com"

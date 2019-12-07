@@ -90,7 +90,7 @@ func (gdb *DB) DistanceIPLatLon(ip string, lat, lon float64) (distance float64, 
 	return gdb.DistanceLatLon(info.Latitude, info.Longitude, lat, lon), nil
 }
 
-// Distance, in meters
+// Distance, in km
 func (gdb *DB) DistanceIP(ip1, ip2 string) (distance float64, err error) {
 	info1, err := gdb.GeoIPLookupIP(ip1)
 	if err != nil {
@@ -106,12 +106,13 @@ func (gdb *DB) DistanceIP(ip1, ip2 string) (distance float64, err error) {
 		info2.Latitude, info2.Longitude), nil
 }
 
+// Distance in km
 func (gdb *DB) DistanceLatLon(lat1, lon1, lat2, lon2 float64) (distance float64) {
 	point1 := haversine.Coord{Lat: lat1, Lon: lon1}
 	point2 := haversine.Coord{Lat: lat2, Lon: lon2}
 	_, distance = haversine.Distance(point1, point2)
 
-	return distance * 1000
+	return distance
 }
 
 func New(file string) *DB {

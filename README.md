@@ -3,6 +3,23 @@ This project offers functionality similar to HAProxy/Nginx though it checks for 
 presence prior to returning redirect to respective upstream. Mainly intended for
 opensource mirrors but can be used (possibly) as a CDN frontend.
 
+Mirror selection algorithms so far:
+
+- First available mirror (the're sorted by latency during app startup). YAML value: `first`
+- The one closest to client (if none are matching, fallback to first available). YAML value: `closest`
+
+
+Can be configured via YAML (with default being first available):
+
+```yaml
+mirrors:
+  - name: "gentoo"
+    prefix: "/gentoo"
+    algorithm: "closest"
+    urls:
+      - "http://gentoo.mirrors.tera-byte.com/"
+```
+
 Returns fastest (lowest HTTP ping) upstream so far.
 
 ## Running

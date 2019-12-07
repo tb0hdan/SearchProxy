@@ -19,9 +19,7 @@ func (ms *MirrorSearch) FindMirrorFirst(requestURI string, w http.ResponseWriter
 		mirror := ms.FindMirrorByURL(mirrorURL)
 
 		if mirror != nil {
-			log.Println(ms.GetDistanceRemoteMirror(r, mirror))
 			ms.Redirect(mirror, mirrorURL, w, r)
-
 			return
 		}
 
@@ -29,9 +27,7 @@ func (ms *MirrorSearch) FindMirrorFirst(requestURI string, w http.ResponseWriter
 	}
 
 	for _, mirror := range ms.Mirrors {
-		log.Println(ms.GetDistanceRemoteMirror(r, mirror))
 		url := strings.TrimRight(mirror.URL, "/") + requestURI
-
 		res, err := ms.CheckMirror(url)
 
 		if err != nil {

@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -62,4 +63,33 @@ func StripRequestURI(requestURI, prefix string) (result string) {
 	}
 
 	return
+}
+
+func GetRemoteAddressFromRequest(r *http.Request) (addr string, err error) {
+	var (
+		remoteAddr string
+	)
+
+	remoteAddr, _, err = net.SplitHostPort(r.RemoteAddr)
+
+	if err != nil {
+		// Something's very wrong with the request
+		return "", err
+	}
+
+	addr = r.Header.Get("X-Real-IP")
+
+	if len(addr) == 0 {
+		addr = r.Header.Get("X-Forwarded-For")
+	}
+
+	// Could not get IP from headers
+	if len(addr) == 0 {
+		addr = remoteAddr
+	} else if !IsLocalNetworkString(remoteAddr) { // IP is from headers, check whether we can trust it
+		// Nope, use remote address instead
+		addr = remoteAddr
+	}
+
+	return addr, nil
 }

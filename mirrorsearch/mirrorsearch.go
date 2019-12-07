@@ -1,7 +1,6 @@
 package mirrorsearch
 
 import (
-	"net"
 	"net/http"
 	"strings"
 
@@ -35,18 +34,10 @@ func (ms *MirrorSearch) GetDistanceRemoteMirror(r *http.Request, mirror *mirrors
 		err error
 	)
 
-	hostIP := r.Header.Get("X-Real-IP")
+	hostIP, err := network.GetRemoteAddressFromRequest(r)
 
-	if hostIP == "" {
-		hostIP = r.Header.Get("X-Forwarded-For")
-	}
-
-	if hostIP == "" {
-		hostIP, _, err = net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			// Something's very wrong with the request
-			return -1
-		}
+	if err != nil {
+		return -1
 	}
 
 	if network.IsLocalNetworkString(hostIP) {
@@ -63,9 +54,8 @@ func (ms *MirrorSearch) GetDistanceRemoteMirror(r *http.Request, mirror *mirrors
 
 	if err != nil {
 		log.Printf("Distance err: %v", err)
+		return -1
 	}
-
-	log.Println(distance, hostIP, mirror.IP)
 
 	return distance
 }
@@ -81,6 +71,8 @@ func (ms *MirrorSearch) SetMirrorSearchAlgorithm(algorithm string) (result func(
 	switch algorithm {
 	case "first":
 		result = ms.FindMirrorFirst
+	case "closest":
+		result = ms.FindClosestMirror
 	default:
 		log.Fatalf("Unknown mirror search algorithm: %s\n", algorithm)
 	}
