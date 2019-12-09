@@ -11,6 +11,7 @@ RUN make
 FROM alpine
 WORKDIR /
 COPY --from=build-env /etc/ssl /etc/ssl
+COPY --from=build-env /searchproxy/*.mmdb /
 COPY --from=build-env /searchproxy/searchproxy /
 COPY --from=build-env /searchproxy/mirrors.yml /
 EXPOSE 8000

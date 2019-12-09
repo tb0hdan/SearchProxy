@@ -47,4 +47,5 @@ requests through a proxy, export environment variable like this:
 ## GeoIP notice
 This project uses [GeoIP2-Golang](https://github.com/oschwald/geoip2-golang) which in turn
 relies on [MaxMind's GeoLite database](https://dev.maxmind.com/geoip/geoip2/geolite2/)
+
 Expected GeoIP DB file: `GeoLite2-City.mmdb`
