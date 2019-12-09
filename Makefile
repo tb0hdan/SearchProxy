@@ -7,7 +7,11 @@ VERSION = $(shell cat ./VERSION)
 
 TESTS = test-geoip test-memcache test-mirrorsort test-server test-util/network test-util/system test-workerpool
 
-build:
+geo:
+	@go get -u github.com/maxmind/geoipupdate/cmd/geoipupdate
+	@geoipupdate -d ./ -f ./etc/geoipupdate.cfg
+
+build: geo
 	@go mod why
 	@go build -v -x -ldflags "-s -w -X main.Build=$(BUILD) -X main.BuildDate=$(BDATE) -X main.GoVersion=$(GO_VERSION) -X main.Version=$(VERSION)" -o searchproxy *.go
 

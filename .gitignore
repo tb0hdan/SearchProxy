@@ -18,6 +18,7 @@
 ssl/
 
 # Maxmind's DB
+.geoipupdate.lock
 *.mmdb
 
 # built version

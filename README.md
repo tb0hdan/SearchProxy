@@ -28,9 +28,9 @@ mirrors:
 
 ## Running
 
-`make`
+`make dockerimage`
 
-`./searchproxy`
+`docker run -p 8000:8000 tb0hdan/searchproxy`
 
 `wget http://localhost:8000/gentoo/distfiles/01-iosevka-1.14.1.zip`
 

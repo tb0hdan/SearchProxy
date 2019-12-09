@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (ms *MirrorSearch) FindClosestMirror(requestURI string, w http.ResponseWriter, r *http.Request) { //nolint
+func (ms *MirrorSearch) FindClosestMirror(requestURI string, w http.ResponseWriter, r *http.Request) { // nolint
 	requestURI = network.StripRequestURI(requestURI, ms.Prefix)
 
 	repackedMirrors := make([]*mirrorsort.MirrorInfo, 0)
