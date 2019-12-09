@@ -32,11 +32,11 @@ mirrors:
 
 `docker run -p 8000:8000 tb0hdan/searchproxy`
 
+
+To confirm that SearchProxy returns link to file:
+
 `wget --spider http://localhost:8000/gentoo/distfiles/01-iosevka-1.14.1.zip`
 
-or
-
-`wget http://localhost:8000/debian/ls-lR.gz`
 
 ## HTTP proxy support
 SearchProxy uses Go's built-in http client with HTTP proxy support. In order to send all
