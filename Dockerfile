@@ -1,10 +1,11 @@
 # build stage
 FROM golang:alpine AS build-env
 WORKDIR /searchproxy
-ADD ./ssl /etc/ssl
+#ADD ./ssl /etc/ssl
 ADD . /searchproxy/
 RUN apk update
 RUN apk add git make gcc libc-dev
+RUN apk add --no-cache ca-certificates apache2-utils
 RUN make
 
 # final stage

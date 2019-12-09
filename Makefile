@@ -13,10 +13,12 @@ geo:
 
 build: geo
 	@go mod why
+	@go build -tags netgo -installsuffix netgo -v -x -ldflags "-s -w -X main.Build=$(BUILD) -X main.BuildDate=$(BDATE) -X main.GoVersion=$(GO_VERSION) -X main.Version=$(VERSION)" -o searchproxy *.go
+
+build-only:
 	@go build -v -x -ldflags "-s -w -X main.Build=$(BUILD) -X main.BuildDate=$(BDATE) -X main.GoVersion=$(GO_VERSION) -X main.Version=$(VERSION)" -o searchproxy *.go
 
 dockerimage:
-	@cp -r /usr/local/etc/openssl ./ssl
 	@docker build -t tb0hdan/searchproxy .
 
 lint:

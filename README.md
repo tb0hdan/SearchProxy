@@ -32,7 +32,7 @@ mirrors:
 
 `docker run -p 8000:8000 tb0hdan/searchproxy`
 
-`wget http://localhost:8000/gentoo/distfiles/01-iosevka-1.14.1.zip`
+`wget --spider http://localhost:8000/gentoo/distfiles/01-iosevka-1.14.1.zip`
 
 or
 
@@ -49,3 +49,9 @@ This project uses [GeoIP2-Golang](https://github.com/oschwald/geoip2-golang) whi
 relies on [MaxMind's GeoLite database](https://dev.maxmind.com/geoip/geoip2/geolite2/)
 
 Expected GeoIP DB file: `GeoLite2-City.mmdb`
+
+
+## Thanks
+
+[Docker Golang](https://www.docker.com/blog/docker-golang/)
+
