@@ -33,7 +33,6 @@ func NewMirrorServer(config *MirrorServerConfig) *MirrorServer {
 		GeoIPDBFile: config.GeoIPDBFile,
 		BuildInfo:   config.BuildInfo,
 	}
-	ms.Search = Search
 	// Should be set via *MirrorServerConfig / yml
 	ms.SearchMethod = Search.SetMirrorSearchAlgorithm(config.SearchAlgorithm)
 

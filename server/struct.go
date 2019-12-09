@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"searchproxy/memcache"
-	"searchproxy/mirrorsearch"
 	"searchproxy/mirrorsort"
 	"searchproxy/util/miscellaneous"
 
@@ -23,7 +22,6 @@ type SearchProxyServer struct {
 
 type MirrorServer struct {
 	Prefix       string
-	Search       *mirrorsearch.MirrorSearch
 	SearchMethod func(requestURI string, w http.ResponseWriter, r *http.Request)
 }
 
