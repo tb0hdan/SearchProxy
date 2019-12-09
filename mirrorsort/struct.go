@@ -23,3 +23,11 @@ type MirrorInfo struct {
 	// Used for closes mirror search, calculated only then
 	Distance float64
 }
+
+type ByPing []*MirrorInfo
+
+type ByDistance []*MirrorInfo
+type Sorter struct {
+	GeoIPDBFile string
+	BuildInfo   *miscellaneous.BuildInfo
+}

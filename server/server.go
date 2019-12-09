@@ -12,6 +12,7 @@ import (
 	"searchproxy/memcache"
 	"searchproxy/mirrorsort"
 	"searchproxy/util/miscellaneous"
+	"searchproxy/util/network"
 
 	"github.com/didip/tollbooth"
 	"github.com/gorilla/mux"
@@ -66,9 +67,8 @@ func (sps *SearchProxyServer) setupRateLimitMiddleWare() (middleWare *limiter.Li
 }
 
 func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.MirrorInfo, prefix, algorithm string) {
-	cache := memcache.New()
 	msConfig := &MirrorServerConfig{
-		Cache:           cache,
+		Cache:           memcache.New(),
 		Mirrors:         mirrors,
 		Prefix:          prefix,
 		GeoIPDBFile:     sps.GeoIPDBFile,
@@ -82,8 +82,7 @@ func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.Mi
 }
 
 func (sps *SearchProxyServer) serveRoot(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Hello normal index\n")
+	network.WriteNormalResponse(w, "Hello normal index\n")
 
 	for _, proxy := range sps.Proxies {
 		fmt.Fprintf(w, "Endpoint: %s\n", proxy)
@@ -95,7 +94,6 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 
 	var Config MirrorsConfig
 
-	viper.SetDefault(".algorithm", "first")
 	viper.SetConfigName(fpattern)
 	viper.AddConfigPath(fdir)
 	viper.SetConfigType("yaml")

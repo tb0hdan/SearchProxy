@@ -12,10 +12,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type HTTPUtilities struct {
-	BuildInfo *miscellaneous.BuildInfo
-}
-
 func (hu *HTTPUtilities) HTTPHEAD(url string) (res *http.Response, err error) {
 	client := &http.Client{}
 
@@ -92,4 +88,17 @@ func GetRemoteAddressFromRequest(r *http.Request) (addr string, err error) {
 	}
 
 	return addr, nil
+}
+
+func WriteResponse(w http.ResponseWriter, statusCode int, content string) {
+	w.WriteHeader(statusCode)
+	fmt.Fprint(w, content)
+}
+
+func WriteNormalResponse(w http.ResponseWriter, content string) {
+	WriteResponse(w, http.StatusOK, content)
+}
+
+func WriteNotFound(w http.ResponseWriter) {
+	WriteResponse(w, http.StatusNotFound, "404 page not found")
 }

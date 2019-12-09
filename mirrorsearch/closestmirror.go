@@ -11,10 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type MirrorCache struct {
-	KnownURLs map[string]bool
-}
-
 func (ms *MirrorSearch) FindClosestMirror(requestURI string, w http.ResponseWriter, r *http.Request) { //nolint
 	requestURI = network.StripRequestURI(requestURI, ms.Prefix)
 

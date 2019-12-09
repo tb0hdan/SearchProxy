@@ -1,7 +1,6 @@
 package mirrorsearch
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -46,6 +45,5 @@ func (ms *MirrorSearch) FindMirrorFirst(requestURI string, w http.ResponseWriter
 		}
 	}
 
-	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprintf(w, "404 page not found")
+	network.WriteNotFound(w)
 }

@@ -1,15 +1,14 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
+
 	"searchproxy/mirrorsearch"
 	"searchproxy/util/network"
 )
 
 func (ms *MirrorServer) serveRoot(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Hello index")
+	network.WriteNormalResponse(w, "hello index")
 }
 
 func (ms *MirrorServer) CatchAllHandler(w http.ResponseWriter, r *http.Request) {

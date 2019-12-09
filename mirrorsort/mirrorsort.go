@@ -9,22 +9,13 @@ import (
 	"searchproxy/workerpool"
 )
 
-type ByPing []*MirrorInfo
-
 func (a ByPing) Len() int           { return len(a) }
 func (a ByPing) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByPing) Less(i, j int) bool { return a[i].PingMS < a[j].PingMS }
 
-type ByDistance []*MirrorInfo
-
 func (a ByDistance) Len() int           { return len(a) }
 func (a ByDistance) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByDistance) Less(i, j int) bool { return a[i].Distance < a[j].Distance }
-
-type Sorter struct {
-	GeoIPDBFile string
-	BuildInfo   *miscellaneous.BuildInfo
-}
 
 func (srt *Sorter) PingHTTPWrapper(item interface{}) interface{} {
 	url := item.(string)

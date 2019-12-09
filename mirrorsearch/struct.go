@@ -13,3 +13,7 @@ type MirrorSearch struct {
 	GeoIPDBFile string
 	BuildInfo   *miscellaneous.BuildInfo
 }
+
+type MirrorCache struct {
+	KnownURLs map[string]bool
+}
