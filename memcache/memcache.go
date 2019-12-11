@@ -1,10 +1,6 @@
 package memcache
 
-import (
-	"time"
-
-	log "github.com/sirupsen/logrus"
-)
+import "time"
 
 func (mc *CacheType) Get(key string) (value interface{}, ok bool) {
 	mc.m.RLock()
@@ -70,7 +66,7 @@ func (mc *CacheType) Evictor() {
 				}
 
 				if value.Expires-time.Now().Unix() <= 0 {
-					log.Printf("Evicting %s\n", key)
+					mc.logger.Printf("Evicting %s\n", key)
 					mc.UnsafeDelete(key)
 				}
 			}
@@ -83,13 +79,14 @@ func (mc *CacheType) Stop() {
 	mc.ticker.Stop()
 	mc.done <- struct{}{}
 
-	log.Debug("Memcache is saying goodbye!")
+	mc.logger.Debug("Memcache is saying goodbye!")
 }
 
-func New() (memCache *CacheType) {
+func New(logger Logger) (memCache *CacheType) {
 	memCache = &CacheType{cache: make(map[string]*ValueType),
 		done:   make(chan struct{}),
 		ticker: time.NewTicker(1 * time.Second),
+		logger: logger,
 	}
 	go memCache.Evictor()
 

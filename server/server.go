@@ -68,7 +68,7 @@ func (sps *SearchProxyServer) setupRateLimitMiddleWare() (middleWare *limiter.Li
 
 func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.MirrorInfo, prefix, algorithm string) {
 	msConfig := &MirrorServerConfig{
-		Cache:           memcache.New(),
+		Cache:           memcache.New(log.New()),
 		Mirrors:         mirrors,
 		Prefix:          prefix,
 		GeoIPDBFile:     sps.GeoIPDBFile,

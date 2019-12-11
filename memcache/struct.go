@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+type Logger interface {
+	Printf(fmt string, args ...interface{})
+	Debug(s ...interface{})
+}
+
 type ValueType struct {
 	Value   interface{}
 	Expires int64
@@ -15,4 +20,5 @@ type CacheType struct {
 	m      sync.RWMutex
 	ticker *time.Ticker
 	done   chan struct{}
+	logger Logger
 }
