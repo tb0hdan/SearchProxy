@@ -1,9 +1,10 @@
 package mirrorsearch
 
 import (
-	"searchproxy/memcache"
 	"searchproxy/mirrorsort"
 	"searchproxy/util/miscellaneous"
+
+	"github.com/tb0hdan/memcache"
 )
 
 type MirrorSearch struct {

@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"searchproxy/memcache"
 	"searchproxy/mirrorsort"
 	"searchproxy/util/miscellaneous"
 	"searchproxy/util/network"
@@ -17,6 +16,8 @@ import (
 	"github.com/didip/tollbooth"
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
+
+	"github.com/tb0hdan/memcache"
 
 	"github.com/didip/tollbooth/limiter"
 

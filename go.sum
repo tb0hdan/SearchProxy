@@ -113,6 +113,8 @@ github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/subosito/gotenv v1.2.0 h1:Slr1R9HxAlEKefgq5jn9U+DnETlIUa6HfgEzj0g5d7s=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
+github.com/tb0hdan/memcache v0.0.0-20191211132854-75fc548e7718 h1:k2GMP1X0Jq8mzV8NiJLIykWy5Hnb4PkoyKHqj3A76gI=
+github.com/tb0hdan/memcache v0.0.0-20191211132854-75fc548e7718/go.mod h1:frr/2V9dUME7iRSeAc+lVx4if4baEB81Z2rzNVbn6pI=
 github.com/theckman/go-flock v0.7.1 h1:YdJyIjDuQdEU7voZ9YaeXSO4OnrxdI+WejPUwyZ/Txs=
 github.com/theckman/go-flock v0.7.1/go.mod h1:kjuth3y9VJ2aNlkNEO99G/8lp9fMIKaGyBmh84IBheM=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=

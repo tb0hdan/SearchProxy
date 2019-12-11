@@ -3,11 +3,11 @@ package server
 import (
 	"net/http"
 
-	"searchproxy/memcache"
 	"searchproxy/mirrorsort"
 	"searchproxy/util/miscellaneous"
 
 	"github.com/gorilla/mux"
+	"github.com/tb0hdan/memcache"
 )
 
 type SearchProxyServer struct {

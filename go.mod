@@ -15,6 +15,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.5.0
 	github.com/stretchr/testify v1.2.2
+	github.com/tb0hdan/memcache v0.0.0-20191211132854-75fc548e7718
 	github.com/theckman/go-flock v0.7.1 // indirect
 	github.com/umahmood/haversine v0.0.0-20151105152445-808ab04add26
 )
