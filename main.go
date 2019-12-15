@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -25,9 +27,19 @@ func main() {
 		readTimeout  = flag.Int("readt", 30, "Read timeout, seconds")
 		writeTimeout = flag.Int("writet", 30, "Write timeout, seconds")
 		mirrorsPath  = flag.String("mirrors", "./mirrors.yml", "Path to mirrors.yml file")
+
+		version = flag.Bool("version", false, "Print version and exit")
 	)
 
 	flag.Parse()
+
+	if *version {
+		fmt.Printf("%s version %s\n", server.ProductName, Version)
+		fmt.Printf("Build: %s\n", Build)
+		fmt.Printf("BuildDate: %s\n", BuildDate)
+		fmt.Printf("Go: %s\n\n", GoVersion)
+		os.Exit(0)
+	}
 
 	buildInfo := &miscellaneous.BuildInfo{
 		Build:     Build,

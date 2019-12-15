@@ -15,7 +15,7 @@ func TestDB_DistanceIP(t *testing.T) {
 	assert := testifyAssert.New(t)
 	geo := New("../GeoLite2-City.mmdb")
 	dist, err := geo.DistanceIP("1.2.3.4", "4.4.4.4")
-	assert.Equal(float64(0), dist)
+	assert.Equal(8795, int(dist))
 	assert.Nil(err)
 }
 
@@ -23,7 +23,7 @@ func TestDB_DistanceIPLatLon(t *testing.T) {
 	assert := testifyAssert.New(t)
 	geo := New("../GeoLite2-City.mmdb")
 	dist, err := geo.DistanceIPLatLon("1.2.3.4", 50.5, 30.5)
-	assert.Equal(float64(8.980211923272671e+06), dist)
+	assert.Equal(751, int(dist))
 	assert.Nil(err)
 }
 
@@ -31,7 +31,7 @@ func TestDB_DistanceLatLon(t *testing.T) {
 	assert := testifyAssert.New(t)
 	geo := New("../GeoLite2-City.mmdb")
 	dist := geo.DistanceLatLon(120.1, -30.2, 50.5, 30.5)
-	assert.Equal(6.587068819054247e+06, dist)
+	assert.Equal(6587, int(dist))
 }
 
 func TestDB_GeoIPLookupIP(t *testing.T) {
@@ -54,7 +54,7 @@ func TestDB_LookupIP(t *testing.T) {
 	assert := testifyAssert.New(t)
 	geo := New("../GeoLite2-City.mmdb")
 	info, err := geo.LookupIP("125.200.125.200")
-	assert.Equal("Gifu City", info.CityName)
+	assert.Equal("Minokamo", info.CityName)
 	assert.Nil(err)
 }
 
