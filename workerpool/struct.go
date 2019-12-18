@@ -2,6 +2,7 @@ package workerpool
 
 import "sync"
 
+// WorkerPool - straightforward worker pool implementation with bound methods
 type WorkerPool struct {
 	Jobs        chan interface{}
 	Results     chan interface{}

@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Worker - runs worker with specified integer id
 func (wp *WorkerPool) Worker(id int) {
 	for j := range wp.Jobs {
 		log.Debugf("worker %d started job %v", id, j)
@@ -19,6 +20,7 @@ func (wp *WorkerPool) Worker(id int) {
 	}
 }
 
+// ProcessItems - process multiple times in goroutines
 func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) {
 	go func() {
 		var needBreak bool
@@ -77,6 +79,7 @@ func (wp *WorkerPool) ProcessItems(items []interface{}) (results []interface{}) 
 	return results
 }
 
+// New - create worker pool instance properly
 func New(workerCount int, fn func(item interface{}) interface{}) *WorkerPool {
 	return &WorkerPool{
 		Jobs:        make(chan interface{}),

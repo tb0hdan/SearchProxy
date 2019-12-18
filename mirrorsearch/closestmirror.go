@@ -11,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// FindClosestMirror - this bound method searches for closest mirror based on client IP and returns redirect to it
 func (ms *MirrorSearch) FindClosestMirror(requestURI string, w http.ResponseWriter, r *http.Request) { // nolint
 	requestURI = network.StripRequestURI(requestURI, ms.Prefix)
 

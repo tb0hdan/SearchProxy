@@ -9,6 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// FindMirrorFirst - this bound method looks for first mirror in the list that has requestURI.
+// Mirrors are sorted ascending by ping
 func (ms *MirrorSearch) FindMirrorFirst(requestURI string, w http.ResponseWriter, r *http.Request) {
 	requestURI = network.StripRequestURI(requestURI, ms.Prefix)
 

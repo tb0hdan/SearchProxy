@@ -24,6 +24,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Run - runs search proxy server iself
 func (sps *SearchProxyServer) Run() {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -60,6 +61,7 @@ func (sps *SearchProxyServer) Run() {
 	log.Print("[!] SearchProxy normal exit")
 }
 
+// setupRateLimitMiddleWare - configures client-based restrictions
 func (sps *SearchProxyServer) setupRateLimitMiddleWare() (middleWare *limiter.Limiter) {
 	middleWare = tollbooth.NewLimiter(1, &limiter.ExpirableOptions{DefaultExpirationTTL: time.Hour})
 	middleWare.SetIPLookups([]string{"X-Forwarded-For", "X-Real-IP", "RemoteAddr"})
@@ -67,6 +69,7 @@ func (sps *SearchProxyServer) setupRateLimitMiddleWare() (middleWare *limiter.Li
 	return
 }
 
+// RegisterMirrorsWithPrefix - create necessary configuration for multiple HTTP prefixes
 func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.MirrorInfo, prefix, algorithm string) {
 	msConfig := &MirrorServerConfig{
 		Cache:           memcache.New(log.New()),
@@ -82,6 +85,7 @@ func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.Mi
 	sps.Proxies = append(sps.Proxies, prefix)
 }
 
+// serveRoot - render index page (unexported)
 func (sps *SearchProxyServer) serveRoot(w http.ResponseWriter, r *http.Request) {
 	network.WriteNormalResponse(w, "Hello normal index\n")
 
@@ -90,6 +94,7 @@ func (sps *SearchProxyServer) serveRoot(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+// ConfigFromFile - apply configuration read from file
 func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 	const DefaultAlgorithm = "first"
 
@@ -130,6 +135,7 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 	log.Println("[i] Mirror registration complete")
 }
 
+// SetDebug - enable/disable debug based on flag
 func (sps *SearchProxyServer) SetDebug(debug bool) {
 	if debug {
 		log.SetFormatter(&log.TextFormatter{
@@ -145,6 +151,7 @@ func (sps *SearchProxyServer) SetDebug(debug bool) {
 	}
 }
 
+// SetGeoIPDBFile - set path to GeoIP DB file
 func (sps *SearchProxyServer) SetGeoIPDBFile(dbFile string) {
 	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
 		log.Fatalf("[E] Cannot start with non-existing GeoIP DB file: %s", dbFile)
@@ -153,10 +160,12 @@ func (sps *SearchProxyServer) SetGeoIPDBFile(dbFile string) {
 	sps.GeoIPDBFile = dbFile
 }
 
+// Stop - run shutdown chores
 func (sps *SearchProxyServer) Stop() {
 	// no code yet
 }
 
+// New - create search proxy server instance and populate it with data
 func New(addr string, readTimeout, writeTimeout int, buildInfo *miscellaneous.BuildInfo) (sps *SearchProxyServer) {
 	sps = &SearchProxyServer{
 		Addr:         addr,

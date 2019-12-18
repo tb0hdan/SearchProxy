@@ -1,9 +1,11 @@
 package geoip
 
+// DB - GeoIP database with bound methods
 type DB struct {
 	file string
 }
 
+// Info - Basic IP information
 type Info struct {
 	CountryName string
 	CountryCode string

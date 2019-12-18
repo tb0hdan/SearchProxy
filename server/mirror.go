@@ -7,10 +7,12 @@ import (
 	"searchproxy/util/network"
 )
 
+// serveRoot - index page renderer (unexported)
 func (ms *MirrorServer) serveRoot(w http.ResponseWriter, _ *http.Request) {
 	network.WriteNormalResponse(w, "hello index")
 }
 
+// CatchAllHandler - catch all requested URLs and dispatch them accordingly
 func (ms *MirrorServer) CatchAllHandler(w http.ResponseWriter, r *http.Request) {
 	strippedURI := network.StripRequestURI(r.RequestURI, ms.Prefix)
 	if strippedURI == "/" || strippedURI == "/index.htm" || strippedURI == "/index.html" {
@@ -21,6 +23,7 @@ func (ms *MirrorServer) CatchAllHandler(w http.ResponseWriter, r *http.Request) 
 	ms.SearchMethod(r.RequestURI, w, r)
 }
 
+// NewMirrorServer - create mirror server instance and populate it properly
 func NewMirrorServer(config *MirrorServerConfig) *MirrorServer {
 	ms := &MirrorServer{
 		Prefix: config.Prefix,

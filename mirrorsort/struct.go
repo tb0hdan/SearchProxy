@@ -5,12 +5,14 @@ import (
 	"searchproxy/util/miscellaneous"
 )
 
+// MirrorStats - individual mirror statistics
 type MirrorStats struct {
 	// Timestamp
 	LastChecked           int64
 	ConnectionsSinceStart int64
 }
 
+// MirrorInfo - individual mirror information
 type MirrorInfo struct {
 	URL         string
 	IP          string
@@ -24,9 +26,13 @@ type MirrorInfo struct {
 	Distance float64
 }
 
+// ByPing - used for sorting by mirror ping latency
 type ByPing []*MirrorInfo
 
+// ByDistance - used for sorting by distance to mirror
 type ByDistance []*MirrorInfo
+
+// Sorter - sorter with bound methods
 type Sorter struct {
 	GeoIPDBFile string
 	BuildInfo   *miscellaneous.BuildInfo

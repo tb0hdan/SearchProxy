@@ -8,6 +8,7 @@ import (
 	"net/url"
 )
 
+// LookupHostByURL - return hostname by URL
 func LookupHostByURL(rurl string) (host string, err error) {
 	parsed, err := url.Parse(rurl)
 	if err != nil {
@@ -18,6 +19,7 @@ func LookupHostByURL(rurl string) (host string, err error) {
 	return parsed.Host, nil
 }
 
+// LookupIPByHost - return list of IP addresses for a host
 func LookupIPByHost(host string) (ips []net.IP, err error) {
 	ips, err = net.LookupIP(host)
 	if err != nil {
@@ -28,6 +30,7 @@ func LookupIPByHost(host string) (ips []net.IP, err error) {
 	return ips, nil
 }
 
+// LookupIPByURL - return list of IP addresses for an URL
 func LookupIPByURL(rurl string) (ips []net.IP, err error) {
 	host, err := LookupHostByURL(rurl)
 	if err != nil {
@@ -42,6 +45,7 @@ func LookupIPByURL(rurl string) (ips []net.IP, err error) {
 	return ips, nil
 }
 
+// IsLocalNetwork - confirm that IP is in local network
 func IsLocalNetwork(ip net.IP) (result bool) {
 	LocalNetworks := []string{
 		"10.0.0.1/8",
@@ -70,6 +74,7 @@ func IsLocalNetwork(ip net.IP) (result bool) {
 	return result
 }
 
+// IsLocalNetworkString - confirm that IP is in local network - works with string
 func IsLocalNetworkString(ipAddress string) (result bool) {
 	// convenience method
 	return IsLocalNetwork(net.ParseIP(ipAddress))

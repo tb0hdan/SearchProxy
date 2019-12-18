@@ -12,6 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// HTTPHEAD - run HTTP HEAD request against URL
 func (hu *HTTPUtilities) HTTPHEAD(url string) (res *http.Response, err error) {
 	client := &http.Client{}
 
@@ -32,6 +33,7 @@ func (hu *HTTPUtilities) HTTPHEAD(url string) (res *http.Response, err error) {
 	return res, nil
 }
 
+// PingHTTP - run HTTP HEAD against URL and measure response time
 func (hu *HTTPUtilities) PingHTTP(url string) (elapsed int64) {
 	start := time.Now().UnixNano()
 	res, err := hu.HTTPHEAD(url)
@@ -48,10 +50,12 @@ func (hu *HTTPUtilities) PingHTTP(url string) (elapsed int64) {
 	return
 }
 
+// NewHTTPUtilities - create new http utilities instance
 func NewHTTPUtilities(buildInfo *miscellaneous.BuildInfo) *HTTPUtilities {
 	return &HTTPUtilities{BuildInfo: buildInfo}
 }
 
+// StripRequestURI - remove prefix from URI
 func StripRequestURI(requestURI, prefix string) (result string) {
 	result = strings.TrimLeft(requestURI, prefix)
 	if !strings.HasPrefix(result, "/") {
@@ -61,6 +65,7 @@ func StripRequestURI(requestURI, prefix string) (result string) {
 	return
 }
 
+// GetRemoteAddressFromRequest - returns remote address based on request headers. Respects X-Forwarded-For
 func GetRemoteAddressFromRequest(r *http.Request) (addr string, err error) {
 	var (
 		remoteAddr string
@@ -90,15 +95,18 @@ func GetRemoteAddressFromRequest(r *http.Request) (addr string, err error) {
 	return addr, nil
 }
 
+// WriteResponse - shorthand function for writing HTTP responses
 func WriteResponse(w http.ResponseWriter, statusCode int, content string) {
 	w.WriteHeader(statusCode)
 	fmt.Fprint(w, content)
 }
 
+// WriteNormalResponse - shorthand function for 200 OK replies
 func WriteNormalResponse(w http.ResponseWriter, content string) {
 	WriteResponse(w, http.StatusOK, content)
 }
 
+// WriteNotFound - shorthand function for 404 not found replies
 func WriteNotFound(w http.ResponseWriter) {
 	WriteResponse(w, http.StatusNotFound, "404 page not found")
 }

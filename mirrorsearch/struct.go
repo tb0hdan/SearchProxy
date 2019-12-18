@@ -7,6 +7,7 @@ import (
 	"github.com/tb0hdan/memcache"
 )
 
+// MirrorSearch - mirror search with bound methods
 type MirrorSearch struct {
 	Cache       *memcache.CacheType
 	Mirrors     []*mirrorsort.MirrorInfo
@@ -15,6 +16,7 @@ type MirrorSearch struct {
 	BuildInfo   *miscellaneous.BuildInfo
 }
 
+// MirrorCache - mirror info cache
 type MirrorCache struct {
 	KnownURLs map[string]bool
 }

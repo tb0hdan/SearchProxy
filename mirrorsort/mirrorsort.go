@@ -17,6 +17,7 @@ func (a ByDistance) Len() int           { return len(a) }
 func (a ByDistance) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByDistance) Less(i, j int) bool { return a[i].Distance < a[j].Distance }
 
+// PingHTTPWrapper - wrapper around mirror ping, used by worker pool
 func (srt *Sorter) PingHTTPWrapper(item interface{}) interface{} {
 	url := item.(string)
 	mirror := NewMirror(url, srt.GeoIPDBFile, srt.BuildInfo)
@@ -25,6 +26,7 @@ func (srt *Sorter) PingHTTPWrapper(item interface{}) interface{} {
 	return mirror
 }
 
+// MirrorSort - sort mirrors
 func (srt *Sorter) MirrorSort(urls []string) (mirrors []*MirrorInfo) {
 	var (
 		repackMirror []interface{}
@@ -61,6 +63,7 @@ func (srt *Sorter) MirrorSort(urls []string) (mirrors []*MirrorInfo) {
 	return mirrors
 }
 
+// NewSorter - create mirror sorter instance and populate it properly
 func NewSorter(geoIPDBFile string, buildInfo *miscellaneous.BuildInfo) *Sorter {
 	return &Sorter{
 		GeoIPDBFile: geoIPDBFile,
