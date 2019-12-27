@@ -2,6 +2,7 @@ package mirrorsort
 
 import (
 	"sort"
+	"time"
 
 	"searchproxy/util/miscellaneous"
 	"searchproxy/util/network"
@@ -20,7 +21,7 @@ func (a ByDistance) Less(i, j int) bool { return a[i].Distance < a[j].Distance }
 // PingHTTPWrapper - wrapper around mirror ping, used by worker pool
 func (srt *Sorter) PingHTTPWrapper(item interface{}) interface{} {
 	url := item.(string)
-	mirror := NewMirror(url, srt.GeoIPDBFile, srt.BuildInfo)
+	mirror := NewMirror(url, srt.GeoIPDBFile, srt.BuildInfo, srt.RequestTimeout)
 	mirror.Update()
 
 	return mirror
@@ -64,9 +65,10 @@ func (srt *Sorter) MirrorSort(urls []string) (mirrors []*MirrorInfo) {
 }
 
 // NewSorter - create mirror sorter instance and populate it properly
-func NewSorter(geoIPDBFile string, buildInfo *miscellaneous.BuildInfo) *Sorter {
+func NewSorter(geoIPDBFile string, buildInfo *miscellaneous.BuildInfo, requestTimeout time.Duration) *Sorter {
 	return &Sorter{
-		GeoIPDBFile: geoIPDBFile,
-		BuildInfo:   buildInfo,
+		GeoIPDBFile:    geoIPDBFile,
+		BuildInfo:      buildInfo,
+		RequestTimeout: requestTimeout,
 	}
 }

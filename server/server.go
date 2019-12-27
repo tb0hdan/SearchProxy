@@ -71,6 +71,7 @@ func (sps *SearchProxyServer) setupRateLimitMiddleWare() (middleWare *limiter.Li
 
 // RegisterMirrorsWithPrefix - create necessary configuration for multiple HTTP prefixes
 func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.MirrorInfo, prefix, algorithm string) {
+	requestTimeout := time.Duration(int64(sps.RequestTimeout) * time.Second.Nanoseconds())
 	msConfig := &MirrorServerConfig{
 		Cache:           memcache.New(log.New()),
 		Mirrors:         mirrors,
@@ -78,6 +79,7 @@ func (sps *SearchProxyServer) RegisterMirrorsWithPrefix(mirrors []*mirrorsort.Mi
 		GeoIPDBFile:     sps.GeoIPDBFile,
 		BuildInfo:       sps.BuildInfo,
 		SearchAlgorithm: algorithm,
+		RequestTimeout:  requestTimeout,
 	}
 	ms := NewMirrorServer(msConfig)
 	middleWare := sps.setupRateLimitMiddleWare()
@@ -119,7 +121,8 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 		log.Fatalf("Unable to decode")
 	}
 
-	sorter := mirrorsort.NewSorter(sps.GeoIPDBFile, sps.BuildInfo)
+	requestTimeout := time.Duration(int64(sps.RequestTimeout) * time.Second.Nanoseconds())
+	sorter := mirrorsort.NewSorter(sps.GeoIPDBFile, sps.BuildInfo, requestTimeout)
 
 	for _, cfg := range Config.Mirrors {
 		log.Printf("[i] Registering mirror `%s` with prefix `%s`\n", cfg.Name, cfg.Prefix)
@@ -166,13 +169,19 @@ func (sps *SearchProxyServer) Stop() {
 }
 
 // New - create search proxy server instance and populate it with data
-func New(addr string, readTimeout, writeTimeout int, buildInfo *miscellaneous.BuildInfo) (sps *SearchProxyServer) {
+func New(
+	addr string,
+	readTimeout,
+	writeTimeout,
+	requestTimeout int,
+	buildInfo *miscellaneous.BuildInfo) (sps *SearchProxyServer) {
 	sps = &SearchProxyServer{
-		Addr:         addr,
-		ReadTimeout:  readTimeout,
-		WriteTimeout: writeTimeout,
-		BuildInfo:    buildInfo,
-		Gorilla:      mux.NewRouter(),
+		Addr:           addr,
+		ReadTimeout:    readTimeout,
+		WriteTimeout:   writeTimeout,
+		RequestTimeout: requestTimeout,
+		BuildInfo:      buildInfo,
+		Gorilla:        mux.NewRouter(),
 	}
 
 	sps.Gorilla.HandleFunc("/", sps.serveRoot)

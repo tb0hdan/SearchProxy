@@ -66,7 +66,7 @@ func (ms *MirrorSearch) GetDistanceRemoteMirror(r *http.Request, mirror *mirrors
 // CheckMirror - ping mirror and confirm that it's ok
 func (ms *MirrorSearch) CheckMirror(mirrorURL string) (res *http.Response, err error) {
 	// This method will be extended with rate limiting a little bit later
-	myHTTP := network.NewHTTPUtilities(ms.BuildInfo)
+	myHTTP := network.NewHTTPUtilities(ms.BuildInfo, ms.RequestTimeout)
 	return myHTTP.HTTPHEAD(mirrorURL)
 }
 

@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"time"
 
 	"searchproxy/mirrorsort"
 	"searchproxy/util/miscellaneous"
@@ -12,13 +13,14 @@ import (
 
 // SearchProxyServer - proxy server with bound methods
 type SearchProxyServer struct {
-	Gorilla      *mux.Router
-	Addr         string
-	ReadTimeout  int
-	WriteTimeout int
-	Proxies      []string
-	GeoIPDBFile  string
-	BuildInfo    *miscellaneous.BuildInfo
+	Gorilla        *mux.Router
+	Addr           string
+	ReadTimeout    int
+	WriteTimeout   int
+	RequestTimeout int
+	Proxies        []string
+	GeoIPDBFile    string
+	BuildInfo      *miscellaneous.BuildInfo
 }
 
 // MirrorServer - mirror server with bound methods
@@ -35,6 +37,7 @@ type MirrorServerConfig struct {
 	GeoIPDBFile     string
 	BuildInfo       *miscellaneous.BuildInfo
 	SearchAlgorithm string
+	RequestTimeout  time.Duration
 }
 
 // MirrorConfig - individual mirror configuration

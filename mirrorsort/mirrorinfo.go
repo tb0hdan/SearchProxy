@@ -1,6 +1,8 @@
 package mirrorsort
 
 import (
+	"time"
+
 	"searchproxy/util/miscellaneous"
 	"searchproxy/util/network"
 
@@ -12,7 +14,7 @@ import (
 
 // UpdateMS - update mirror ping in milliseconds
 func (mi *MirrorInfo) UpdateMS() {
-	myHTTP := network.NewHTTPUtilities(mi.BuildInfo)
+	myHTTP := network.NewHTTPUtilities(mi.BuildInfo, mi.RequestTimeout)
 	mi.PingMS = myHTTP.PingHTTP(mi.URL)
 }
 
@@ -63,11 +65,12 @@ func (mi *MirrorInfo) PlusConnection() {
 }
 
 // NewMirror - instantiate mirror and populate structure
-func NewMirror(url, geoIPDBFile string, buildInfo *miscellaneous.BuildInfo) *MirrorInfo {
+func NewMirror(url, geoIPDBFile string, buildInfo *miscellaneous.BuildInfo, requestTimeout time.Duration) *MirrorInfo {
 	return &MirrorInfo{
-		URL:         url,
-		Stats:       &MirrorStats{},
-		GeoIPDBFile: geoIPDBFile,
-		BuildInfo:   buildInfo,
+		URL:            url,
+		Stats:          &MirrorStats{},
+		GeoIPDBFile:    geoIPDBFile,
+		BuildInfo:      buildInfo,
+		RequestTimeout: requestTimeout,
 	}
 }

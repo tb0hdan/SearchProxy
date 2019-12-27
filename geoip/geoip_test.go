@@ -62,6 +62,6 @@ func TestDB_LookupURL(t *testing.T) {
 	assert := testifyAssert.New(t)
 	geo := New("../GeoLite2-City.mmdb")
 	info, err := geo.LookupURL("https://www.foobar.com/1/2/3")
-	assert.Equal("Los Angeles", info.CityName)
+	assert.Equal("El Segundo", info.CityName)
 	assert.Nil(err)
 }

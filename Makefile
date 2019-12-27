@@ -4,7 +4,7 @@ BUILD = $(shell git rev-parse HEAD)
 BDATE = $(shell date -u '+%Y-%m-%d_%I:%M:%S%p_UTC')
 GO_VERSION = $(shell go version|awk '{print $$3}')
 VERSION = $(shell cat ./VERSION)
-LINTS = lint-geoip lint-mirrorsearch lint-mirrorsort lint-server lint-util/miscellaneous lint-util/network lint-util/system lint-workerpool
+LINTS = lint-main.go lint-geoip lint-mirrorsearch lint-mirrorsort lint-server lint-util/miscellaneous lint-util/network lint-util/system lint-workerpool
 TESTS = test-geoip test-mirrorsearch test-mirrorsort test-server test-util/network test-util/system test-workerpool
 
 

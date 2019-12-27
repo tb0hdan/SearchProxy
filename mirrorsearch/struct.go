@@ -1,6 +1,8 @@
 package mirrorsearch
 
 import (
+	"time"
+
 	"searchproxy/mirrorsort"
 	"searchproxy/util/miscellaneous"
 
@@ -9,11 +11,12 @@ import (
 
 // MirrorSearch - mirror search with bound methods
 type MirrorSearch struct {
-	Cache       *memcache.CacheType
-	Mirrors     []*mirrorsort.MirrorInfo
-	Prefix      string
-	GeoIPDBFile string
-	BuildInfo   *miscellaneous.BuildInfo
+	Cache          *memcache.CacheType
+	Mirrors        []*mirrorsort.MirrorInfo
+	Prefix         string
+	GeoIPDBFile    string
+	BuildInfo      *miscellaneous.BuildInfo
+	RequestTimeout time.Duration
 }
 
 // MirrorCache - mirror info cache

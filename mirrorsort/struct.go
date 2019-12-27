@@ -1,6 +1,8 @@
 package mirrorsort
 
 import (
+	"time"
+
 	"searchproxy/geoip"
 	"searchproxy/util/miscellaneous"
 )
@@ -24,6 +26,8 @@ type MirrorInfo struct {
 	UUID        string
 	// Used for closes mirror search, calculated only then
 	Distance float64
+	//
+	RequestTimeout time.Duration
 }
 
 // ByPing - used for sorting by mirror ping latency
@@ -34,6 +38,7 @@ type ByDistance []*MirrorInfo
 
 // Sorter - sorter with bound methods
 type Sorter struct {
-	GeoIPDBFile string
-	BuildInfo   *miscellaneous.BuildInfo
+	GeoIPDBFile    string
+	BuildInfo      *miscellaneous.BuildInfo
+	RequestTimeout time.Duration
 }

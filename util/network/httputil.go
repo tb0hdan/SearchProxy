@@ -1,6 +1,7 @@
 package network
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -21,6 +22,10 @@ func (hu *HTTPUtilities) HTTPHEAD(url string) (res *http.Response, err error) {
 		return nil, err
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), hu.RequestTimeout)
+	defer cancel()
+
+	req = req.WithContext(ctx)
 	req.Header.Set("User-Agent",
 		fmt.Sprintf("Mozilla/5.0 (compatible; SearchProxy/%s; %s; +https://github.com/tb0hdan/SearchProxy)",
 			hu.BuildInfo.Version, hu.BuildInfo.GoVersion))
@@ -51,8 +56,11 @@ func (hu *HTTPUtilities) PingHTTP(url string) (elapsed int64) {
 }
 
 // NewHTTPUtilities - create new http utilities instance
-func NewHTTPUtilities(buildInfo *miscellaneous.BuildInfo) *HTTPUtilities {
-	return &HTTPUtilities{BuildInfo: buildInfo}
+func NewHTTPUtilities(buildInfo *miscellaneous.BuildInfo, timeout time.Duration) *HTTPUtilities {
+	return &HTTPUtilities{
+		BuildInfo:      buildInfo,
+		RequestTimeout: timeout,
+	}
 }
 
 // StripRequestURI - remove prefix from URI

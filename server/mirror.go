@@ -29,11 +29,12 @@ func NewMirrorServer(config *MirrorServerConfig) *MirrorServer {
 		Prefix: config.Prefix,
 	}
 	Search := &mirrorsearch.MirrorSearch{
-		Cache:       config.Cache,
-		Mirrors:     config.Mirrors,
-		Prefix:      config.Prefix,
-		GeoIPDBFile: config.GeoIPDBFile,
-		BuildInfo:   config.BuildInfo,
+		Cache:          config.Cache,
+		Mirrors:        config.Mirrors,
+		Prefix:         config.Prefix,
+		GeoIPDBFile:    config.GeoIPDBFile,
+		BuildInfo:      config.BuildInfo,
+		RequestTimeout: config.RequestTimeout,
 	}
 	// Should be set via *MirrorServerConfig / yml
 	ms.SearchMethod = Search.SetMirrorSearchAlgorithm(config.SearchAlgorithm)
