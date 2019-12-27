@@ -12,12 +12,15 @@ geo:
 	@go get -u github.com/maxmind/geoipupdate/cmd/geoipupdate
 	@geoipupdate -d ./ -f ./etc/geoipupdate.cfg
 
-build: test geo
+build: mod test geo build-only
+
+mod:
 	@go mod why
-	@go build -a -trimpath -tags netgo -installsuffix netgo -v -x -ldflags "-s -w -X main.Build=$(BUILD) -X main.BuildDate=$(BDATE) -X main.GoVersion=$(GO_VERSION) -X main.Version=$(VERSION)" -o searchproxy *.go
 
 build-only:
-	@go build -a -trimpath -v -x -ldflags "-s -w -X main.Build=$(BUILD) -X main.BuildDate=$(BDATE) -X main.GoVersion=$(GO_VERSION) -X main.Version=$(VERSION)" -o searchproxy *.go
+	@go build -a -trimpath -tags netgo -installsuffix netgo -v -x -ldflags "-s -w -X main.Build=$(BUILD) -X main.BuildDate=$(BDATE) -X main.GoVersion=$(GO_VERSION) -X main.Version=$(VERSION)" -o searchproxy *.go
+	@strip -S -x searchproxy
+
 
 dockerimage:
 	@docker build -t tb0hdan/searchproxy .
