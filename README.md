@@ -1,4 +1,9 @@
 # SearchProxy
+
+[![Build Status](https://travis-ci.org/tb0hdan/SearchProxy.svg?branch=master)](https://travis-ci.org/tb0hdan/SearchProxy)
+[![GoDoc](https://godoc.org/github.com/tb0hdan/SearchProxy?status.svg)](https://godoc.org/github.com/tb0hdan/SearchProxy)
+[![Go Report Card](https://goreportcard.com/badge/github.com/tb0hdan/SearchProxy)](https://goreportcard.com/report/github.com/tb0hdan/SearchProxy)
+
 Redirect to backend server(s) that has the file(s) - no more four-o-four!
 
 This project offers functionality similar to HAProxy/Nginx though it checks for file
@@ -54,4 +59,3 @@ Expected GeoIP DB file: `GeoLite2-City.mmdb`
 ## Thanks
 
 [Docker Golang](https://www.docker.com/blog/docker-golang/)
-

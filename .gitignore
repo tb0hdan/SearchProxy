@@ -21,5 +21,8 @@ ssl/
 .geoipupdate.lock
 *.mmdb
 
+# Code coverage
+coverage.txt
+
 # built version
 searchproxy

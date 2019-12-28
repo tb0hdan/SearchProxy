@@ -6,7 +6,7 @@ GO_VERSION = $(shell go version|awk '{print $$3}')
 VERSION = $(shell cat ./VERSION)
 LINTS = lint-main.go lint-geoip lint-mirrorsearch lint-mirrorsort lint-server lint-util/miscellaneous lint-util/network lint-util/system lint-workerpool
 TESTS = test-geoip test-mirrorsearch test-mirrorsort test-server test-util/network test-util/system test-workerpool
-
+COVERAGE = coverage-main.go coverage-geoip coverage-mirrorsearch coverage-mirrorsort coverage-server coverage-util/miscellaneous coverage-util/network coverage-util/system coverage-workerpool
 
 geo:
 	@go get -u github.com/maxmind/geoipupdate/cmd/geoipupdate
@@ -41,3 +41,8 @@ slow-lint: $(LINTS)
 
 $(LINTS):
 	@golint -set_exit_status=1 $(shell echo $@|awk -F'lint-' '{print $$2}')
+
+codecov: $(COVERAGE)
+
+$(COVERAGE):
+	@go test -race -coverprofile=coverage.txt -covermode=atomic ./$(shell echo $@|awk -F'coverage-' '{print $$2}')
