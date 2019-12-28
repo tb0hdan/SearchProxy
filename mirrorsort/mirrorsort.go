@@ -18,6 +18,12 @@ func (a ByDistance) Len() int           { return len(a) }
 func (a ByDistance) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByDistance) Less(i, j int) bool { return a[i].Distance < a[j].Distance }
 
+func (a ByConnection) Len() int      { return len(a) }
+func (a ByConnection) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ByConnection) Less(i, j int) bool {
+	return a[i].Stats.ConnectionsSinceStart < a[j].Stats.ConnectionsSinceStart
+}
+
 // PingHTTPWrapper - wrapper around mirror ping, used by worker pool
 func (srt *Sorter) PingHTTPWrapper(item interface{}) interface{} {
 	url := item.(string)

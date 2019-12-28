@@ -36,6 +36,9 @@ type ByPing []*MirrorInfo
 // ByDistance - used for sorting by distance to mirror
 type ByDistance []*MirrorInfo
 
+// ByConnection - used for sorting by connections
+type ByConnection []*MirrorInfo
+
 // Sorter - sorter with bound methods
 type Sorter struct {
 	GeoIPDBFile    string

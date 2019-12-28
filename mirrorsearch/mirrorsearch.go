@@ -80,6 +80,8 @@ func (ms *MirrorSearch) SetMirrorSearchAlgorithm(algorithm string) (result func(
 		result = ms.FindClosestMirror
 	case "geobalance":
 		result = ms.GeoBalance
+	case "leastconn":
+		result = ms.LeastConn
 	default:
 		log.Fatalf("Unknown mirror search algorithm: %s\n", algorithm)
 	}
