@@ -61,7 +61,7 @@ func (ms *MirrorSearch) LeastConn(requestURI string, w http.ResponseWriter, r *h
 	if len(repackedMirrors) > 0 {
 		mirror := repackedMirrors[0]
 		url := strings.TrimRight(mirror.URL, "/") + requestURI
-		log.Printf("Requested URL for %s found at %s with connection count %d km",
+		log.Printf("Requested URL for %s found at %s with connection count %d",
 			requestURI, url, int(mirror.Stats.ConnectionsSinceStart))
 		ms.Redirect(mirror, url, w, r)
 
