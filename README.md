@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/tb0hdan/SearchProxy)](https://goreportcard.com/report/github.com/tb0hdan/SearchProxy)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftb0hdan%2FSearchProxy.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftb0hdan%2FSearchProxy?ref=badge_shield)
 
-Redirect to backend server(s) that has the file(s) - no more four-o-four!
+Redirect to backend server that has the file - no more four-o-four!
 
 This project offers functionality similar to HAProxy/Nginx though it checks for file
 presence before returning redirect to respective backend server. Started as a
