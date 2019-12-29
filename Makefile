@@ -46,3 +46,7 @@ codecov: $(COVERAGE)
 
 $(COVERAGE):
 	@go test -race -coverprofile=coverage.txt -covermode=atomic ./$(shell echo $@|awk -F'coverage-' '{print $$2}')
+
+tag:
+	@git tag -a v$(VERSION) -m v$(VERSION)
+	@git push --tags
