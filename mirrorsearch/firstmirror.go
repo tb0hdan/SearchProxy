@@ -14,37 +14,14 @@ import (
 func (ms *MirrorSearch) FindMirrorFirst(requestURI string, w http.ResponseWriter, r *http.Request) {
 	requestURI = network.StripRequestURI(requestURI, ms.Prefix)
 
-	if value, ok := ms.Cache.Get(requestURI); ok {
-		log.Printf("Cached URL for %s found at %s", requestURI, value)
-		mirrorURL := value.(string)
-		mirror := ms.FindMirrorByURL(mirrorURL)
-
-		if mirror != nil {
-			ms.Redirect(mirror, mirrorURL, w, r)
-			return
-		}
-
-		log.Debugf("Could not find mirror for %s, proceeding with full search", requestURI)
-	}
-
-	for _, mirror := range ms.Mirrors {
+	repackedMirrors := ms.GetMirrors(requestURI, r, false)
+	if len(repackedMirrors) > 0 {
+		mirror := repackedMirrors[0]
 		url := strings.TrimRight(mirror.URL, "/") + requestURI
-		res, err := ms.CheckMirror(url)
+		log.Printf("Requested URL for %s found at %s", requestURI, url)
+		ms.Redirect(mirror, url, w, r)
 
-		if err != nil {
-			log.Println(err)
-			continue
-		} else {
-			res.Body.Close()
-		}
-
-		if res.StatusCode == http.StatusOK {
-			log.Printf("Requested URL for %s found at %s", requestURI, url)
-			ms.Redirect(mirror, url, w, r)
-			ms.Cache.SetEx(requestURI, url, 86400)
-
-			return
-		}
+		return
 	}
 
 	network.WriteNotFound(w)

@@ -14,48 +14,8 @@ import (
 // LeastConn - this bound method searches for mirror based on least amount of connections returns redirect to it
 func (ms *MirrorSearch) LeastConn(requestURI string, w http.ResponseWriter, r *http.Request) { // nolint
 	requestURI = network.StripRequestURI(requestURI, ms.Prefix)
-	repackedMirrors := make([]*mirrorsort.MirrorInfo, 0)
 
-	for _, mirror := range ms.Mirrors {
-		url := strings.TrimRight(mirror.URL, "/") + requestURI
-
-		if value, ok := ms.Cache.Get(mirror.UUID); !ok {
-			res, err := ms.CheckMirror(url)
-			// Not found
-			if err != nil {
-				log.Println(err)
-				continue
-			} else {
-				res.Body.Close()
-			}
-
-			mc := &MirrorCache{KnownURLs: map[string]bool{
-				url: true,
-			}}
-			ms.Cache.SetEx(mirror.UUID, mc, 86400)
-		} else {
-			mirrorCache := value.(*MirrorCache)
-			if _, ok := mirrorCache.KnownURLs[url]; ok {
-				// URL is known
-				log.Debugf("Found matching URL in cache: %s", url)
-			} else {
-				// URL is unknown
-				res, err := ms.CheckMirror(url)
-				if err != nil {
-					log.Println(err)
-					continue
-				} else {
-					res.Body.Close()
-					if res.StatusCode == http.StatusOK {
-						mirrorCache.KnownURLs[url] = true
-					}
-				}
-			}
-		}
-
-		repackedMirrors = append(repackedMirrors, mirror)
-	}
-
+	repackedMirrors := ms.GetMirrors(requestURI, r, false)
 	sort.Sort(mirrorsort.ByConnection(repackedMirrors))
 
 	if len(repackedMirrors) > 0 {
