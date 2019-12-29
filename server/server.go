@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
@@ -140,13 +141,21 @@ func (sps *SearchProxyServer) ConfigFromFile(fpattern, fdir string) {
 
 // SetDebug - enable/disable debug based on flag
 func (sps *SearchProxyServer) SetDebug(debug bool) {
-	if debug {
+	sps.Debug = debug
+	if sps.Debug {
 		log.SetFormatter(&log.TextFormatter{
 			DisableColors: true,
 			FullTimestamp: true,
 		})
 		log.SetReportCaller(true)
 		log.SetLevel(log.DebugLevel)
+		// Register debug routes
+		sps.Gorilla.HandleFunc("/debug/pprof/", pprof.Index)
+		sps.Gorilla.HandleFunc("/debug/pprof/{profile}", pprof.Index)
+		sps.Gorilla.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+		sps.Gorilla.HandleFunc("/debug/pprof/profile", pprof.Profile)
+		sps.Gorilla.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+		sps.Gorilla.HandleFunc("/debug/pprof/trace", pprof.Trace)
 	} else {
 		log.SetFormatter(&log.TextFormatter{})
 		log.SetReportCaller(false)

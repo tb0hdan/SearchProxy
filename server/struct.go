@@ -21,6 +21,7 @@ type SearchProxyServer struct {
 	Proxies        []string
 	GeoIPDBFile    string
 	BuildInfo      *miscellaneous.BuildInfo
+	Debug          bool
 }
 
 // MirrorServer - mirror server with bound methods

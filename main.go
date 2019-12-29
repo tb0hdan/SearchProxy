@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"runtime/pprof"
 	"strings"
 
 	"searchproxy/server"
 	"searchproxy/util/miscellaneous"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Global vars for versioning
@@ -19,17 +22,18 @@ var (
 	Version   = "unset" // nolint
 )
 
-func main() {
+func main() { // nolint funlen
 	var (
-		debug          = flag.Bool("debug", false, "enable debug")
 		geoIPDBFile    = flag.String("geoipdb", "GeoLite2-City.mmdb", "Path to Maxmind's DB file")
 		bind           = flag.String("bind", "0.0.0.0:8000", "Address to bind to, host:port")
 		readTimeout    = flag.Int("readt", 30, "Read timeout, seconds")
 		requestTimeout = flag.Int("reqt", 30, "HTTP Request timeout (for mirror checks), seconds")
 		writeTimeout   = flag.Int("writet", 30, "Write timeout, seconds")
 		mirrorsPath    = flag.String("mirrors", "./mirrors.yml", "Path to mirrors.yml file")
-
-		version = flag.Bool("version", false, "Print version and exit")
+		version        = flag.Bool("version", false, "Print version and exit")
+		// Debugging
+		debug      = flag.Bool("debug", false, "enable debug")
+		cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file. Enables debug")
 	)
 
 	flag.Parse()
@@ -49,6 +53,20 @@ func main() {
 		Version:   Version,
 	}
 	searchProxyServer := server.New(*bind, *readTimeout, *writeTimeout, *requestTimeout, buildInfo)
+
+	if *cpuprofile != "" {
+		*debug = true
+		f, err := os.Create(*cpuprofile)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		_ = pprof.StartCPUProfile(f)
+
+		defer pprof.StopCPUProfile()
+	}
+
 	searchProxyServer.SetDebug(*debug)
 	searchProxyServer.SetGeoIPDBFile(*geoIPDBFile)
 
