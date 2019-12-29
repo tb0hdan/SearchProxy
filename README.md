@@ -15,10 +15,8 @@ Backend server selection algorithms so far:
 
 - First available server (the're sorted by latency during app startup). YAML value: `first`
 - The one closest to client (if none are good, fallback to first available). YAML value: `closest`
-
-Algorithms under development:
-
-- Geo balance - same as `closest` but distributes load evenly between selected close servers
+- Least connections (load balanced). YAML value: `leastconn`
+- GeoBalance - combined approach. Three closest mirrors are rotated based on connections amount. YAML value: `geobalance`
 
 
 Can be configured via YAML (with default being first available):
